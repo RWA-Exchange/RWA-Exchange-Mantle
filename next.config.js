@@ -2,7 +2,7 @@
 const nextConfig = {
   webpack: (config, { isServer }) => {
     if (!isServer) {
-      // Fallbacks for browser environment
+      // Fallbacks for browser environment (EVM/Ethereum specific)
       config.resolve.fallback = {
         ...config.resolve.fallback,
         fs: false,
@@ -19,12 +19,6 @@ const nextConfig = {
         path: false,
       };
     }
-
-    // Ignore scrypt native module compilation issues
-    config.externals = config.externals || [];
-    config.externals.push({
-      'scrypt': 'scrypt',
-    });
 
     return config;
   },

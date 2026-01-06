@@ -15,7 +15,7 @@ import {
   useToast,
   Box,
 } from "@chakra-ui/react";
-import { useDappKit } from "@/hooks/useDappKit";
+import { useMantleWallet } from "@/hooks/useOneChainWallet";
 import { useEffect, ReactNode, useState } from "react";
 import { FiAlertCircle, FiWifi, FiWifiOff } from "react-icons/fi";
 import { useRouter } from "next/navigation";
@@ -26,7 +26,7 @@ interface WalletGuardProps {
 }
 
 export function WalletGuard({ children, requireWallet = false }: WalletGuardProps) {
-  const { isConnected, connect } = useDappKit();
+  const { isConnected, connect, switchToMantle } = useMantleWallet();
   const { isOpen, onOpen, onClose } = useDisclosure();
   const router = useRouter();
   const toast = useToast();
@@ -39,7 +39,7 @@ export function WalletGuard({ children, requireWallet = false }: WalletGuardProp
       // Wallet connected successfully - show toast
       toast({
         title: "Wallet Connected",
-        description: "Successfully connected to your wallet",
+        description: "Successfully connected to your wallet on Mantle Network",
         status: "success",
         duration: 3000,
       });
@@ -51,7 +51,7 @@ export function WalletGuard({ children, requireWallet = false }: WalletGuardProp
     setIsConnecting(true);
     
     try {
-      await connect();
+      connect(); // RainbowKit handles the connection flow
       // Success will be handled by useEffect when isConnected changes
     } catch (error: any) {
       const errorMessage = error?.message || 'Unknown error';
@@ -69,7 +69,7 @@ export function WalletGuard({ children, requireWallet = false }: WalletGuardProp
                  errorMessage.includes('not installed')) {
         toast({
           title: "Wallet Not Found",
-          description: "Please install a compatible wallet (OneWallet, Sui Wallet)",
+          description: "Please install MetaMask or another compatible wallet",
           status: "error",
           duration: 5000,
         });
@@ -83,6 +83,25 @@ export function WalletGuard({ children, requireWallet = false }: WalletGuardProp
       }
     } finally {
       setIsConnecting(false);
+    }
+  };
+
+  const handleSwitchToMantle = async () => {
+    try {
+      await switchToMantle();
+      toast({
+        title: "Network Switched",
+        description: "Successfully switched to Mantle Network",
+        status: "success",
+        duration: 3000,
+      });
+    } catch (error) {
+      toast({
+        title: "Network Switch Failed",
+        description: "Failed to switch to Mantle Network. Please switch manually.",
+        status: "error",
+        duration: 4000,
+      });
     }
   };
 
@@ -169,10 +188,10 @@ export function WalletGuard({ children, requireWallet = false }: WalletGuardProp
           <ModalBody py={8} px={8}>
             <VStack spacing={5} textAlign="center">
               <Text color="gray.700" _dark={{ color: "gray.300" }} fontSize="lg" fontWeight="600" fontFamily="Outfit">
-                You need to connect your OneChain wallet to access this page.
+                You need to connect your wallet to access this page.
               </Text>
               <Text fontSize="md" color="gray.600" _dark={{ color: "gray.400" }} lineHeight="1.7" fontFamily="Inter">
-                Connect your wallet to view properties, make investments, and manage your portfolio.
+                Connect your wallet to view properties, make investments, and manage your portfolio on Mantle Network.
               </Text>
             </VStack>
           </ModalBody>
@@ -201,7 +220,27 @@ export function WalletGuard({ children, requireWallet = false }: WalletGuardProp
                 }}
                 transition="all 0.3s cubic-bezier(0.4, 0, 0.2, 1)"
               >
-                Connect OneChain Wallet
+                Connect Wallet
+              </Button>
+              <Button
+                variant="outline"
+                width="full"
+                h="48px"
+                fontSize="md"
+                fontWeight="600"
+                fontFamily="Outfit"
+                color="green.600"
+                borderColor="green.600"
+                onClick={handleSwitchToMantle}
+                isDisabled={isConnecting}
+                _hover={{
+                  bg: "green.50",
+                  borderColor: "green.700",
+                  color: "green.700",
+                }}
+                transition="all 0.2s"
+              >
+                Add Mantle Network
               </Button>
               <Button
                 variant="ghost"

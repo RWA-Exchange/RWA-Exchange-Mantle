@@ -21,19 +21,21 @@ module.exports = {
       url: "http://127.0.0.1:8545",
       chainId: 31337,
     },
-    // OneChain Testnet - Official RPC from documentation
-    onechain_testnet: {
-      url: process.env.ONECHAIN_TESTNET_RPC_URL || "https://rpc-testnet.onelabs.cc:443",
-      chainId: 1001,
+    // Mantle Testnet
+    mantle_testnet: {
+      url: process.env.MANTLE_TESTNET_RPC_URL || "https://rpc.sepolia.mantle.xyz",
+      chainId: 5003,
       accounts: process.env.PRIVATE_KEY ? [process.env.PRIVATE_KEY] : [],
       timeout: 60000,
+      gasPrice: 20000000000, // 20 gwei
     },
-    // OneChain Mainnet - Official RPC from documentation
-    onechain_mainnet: {
-      url: process.env.ONECHAIN_MAINNET_RPC_URL || "https://rpc.mainnet.onelabs.cc:443",
-      chainId: 1000,
+    // Mantle Mainnet
+    mantle_mainnet: {
+      url: process.env.MANTLE_MAINNET_RPC_URL || "https://rpc.mantle.xyz",
+      chainId: 5000,
       accounts: process.env.PRIVATE_KEY ? [process.env.PRIVATE_KEY] : [],
       timeout: 60000,
+      gasPrice: 20000000000, // 20 gwei
     },
   },
   paths: {
@@ -44,24 +46,24 @@ module.exports = {
   },
   etherscan: {
     apiKey: {
-      onechain_testnet: process.env.ONECHAIN_API_KEY || "your-api-key-here",
-      onechain_mainnet: process.env.ONECHAIN_API_KEY || "your-api-key-here",
+      mantle_testnet: process.env.MANTLE_API_KEY || "your-api-key-here",
+      mantle_mainnet: process.env.MANTLE_API_KEY || "your-api-key-here",
     },
     customChains: [
       {
-        network: "onechain_testnet",
-        chainId: 1001,
+        network: "mantle_testnet",
+        chainId: 5003,
         urls: {
-          apiURL: process.env.ONECHAIN_TESTNET_EXPLORER_API || "https://testnet-explorer.onechain.network/api",
-          browserURL: process.env.ONECHAIN_TESTNET_EXPLORER || "https://testnet-explorer.onechain.network"
+          apiURL: process.env.MANTLE_TESTNET_EXPLORER_API || "https://explorer.sepolia.mantle.xyz/api",
+          browserURL: process.env.MANTLE_TESTNET_EXPLORER || "https://explorer.sepolia.mantle.xyz"
         }
       },
       {
-        network: "onechain_mainnet",
-        chainId: 1000,
+        network: "mantle_mainnet",
+        chainId: 5000,
         urls: {
-          apiURL: process.env.ONECHAIN_MAINNET_EXPLORER_API || "https://explorer.onechain.network/api",
-          browserURL: process.env.ONECHAIN_MAINNET_EXPLORER || "https://explorer.onechain.network"
+          apiURL: process.env.MANTLE_MAINNET_EXPLORER_API || "https://explorer.mantle.xyz/api",
+          browserURL: process.env.MANTLE_MAINNET_EXPLORER || "https://explorer.mantle.xyz"
         }
       }
     ]

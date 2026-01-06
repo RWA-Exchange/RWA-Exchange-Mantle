@@ -1,246 +1,155 @@
 import { useState, useEffect, useCallback } from 'react';
-import { oneChainService, WalletAccount } from '@/services/onechain';
-import { Ed25519Keypair } from '@mysten/sui/keypairs/ed25519';
+import { useAccount, useConnect, useDisconnect, useBalance, useSigner } from 'wagmi';
+import { useConnectModal } from '@rainbow-me/rainbowkit';
+import { ethers } from 'ethers';
 
-// Extended wallet account type that includes balance
-export interface WalletAccountWithBalance extends WalletAccount {
+export interface WalletAccountWithBalance {
+  address: string;
   balance?: string;
+  chainId?: number;
 }
 
-export interface UseOneChainWalletReturn {
+export interface UseMantleWalletReturn {
   account: WalletAccountWithBalance | null;
   isConnected: boolean;
   isLoading: boolean;
   error: string | null;
-  connect: () => Promise<WalletAccountWithBalance>;
-  connectExtension: () => Promise<WalletAccountWithBalance>;
+  connect: () => void;
   disconnect: () => void;
-  createWallet: () => Promise<WalletAccountWithBalance>;
-  importWallet: (privateKey: string) => Promise<WalletAccountWithBalance>;
   getBalance: () => Promise<string>;
-  requestFromFaucet: () => Promise<boolean>;
-  sendTransaction: (recipient: string, amount: string) => Promise<string>;
+  getSigner: () => Promise<ethers.Signer | null>;
+  switchToMantle: () => Promise<void>;
 }
 
-export const useOneChainWallet = (): UseOneChainWalletReturn => {
-  const [account, setAccount] = useState<WalletAccountWithBalance | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
-  const [isConnecting, setIsConnecting] = useState(false);
+export const useMantleWallet = (): UseMantleWalletReturn => {
   const [error, setError] = useState<string | null>(null);
+  
+  // Wagmi hooks
+  const { address, isConnected: wagmiConnected, chainId } = useAccount();
+  const { connect: wagmiConnect, connectors, isLoading: connectLoading } = useConnect();
+  const { disconnect: wagmiDisconnect } = useDisconnect();
+  const { data: balanceData, isLoading: balanceLoading, refetch: refetchBalance } = useBalance({
+    address: address,
+  });
+  const { openConnectModal } = useConnectModal();
 
-  const isConnected = !!account;
+  // Create account object
+  const account: WalletAccountWithBalance | null = address ? {
+    address,
+    balance: balanceData ? ethers.formatEther(balanceData.value) : undefined,
+    chainId
+  } : null;
 
-  // Load saved wallet from localStorage on mount and reconnect
-  useEffect(() => {
-    const savedWallet = localStorage.getItem('onechain_wallet');
-    if (savedWallet) {
-      try {
-        const walletData = JSON.parse(savedWallet);
-        setAccount(walletData);
-        
-        // IMPORTANT: Reconnect the wallet service to maintain connection state
-        // Add debounce to prevent multiple reconnections
-        if (!isConnecting) {
-          setIsConnecting(true);
-          oneChainService.connectWalletExtension().then(() => {
-            // Wallet service reconnected successfully
-          }).catch((err) => {
-            // Don't clear the account - UI can still show it
-          }).finally(() => {
-            setIsConnecting(false);
-          });
-        }
-      } catch (err) {
-        console.error('Error loading saved wallet:', err);
-        localStorage.removeItem('onechain_wallet');
+  const isConnected = wagmiConnected && !!address;
+  const isLoading = connectLoading || balanceLoading;
+
+  // Connect function that opens RainbowKit modal
+  const connect = useCallback(() => {
+    setError(null);
+    if (openConnectModal) {
+      openConnectModal();
+    } else {
+      // Fallback to direct connector if modal not available
+      const injectedConnector = connectors.find(c => c.name === 'MetaMask' || c.name === 'Injected');
+      if (injectedConnector) {
+        wagmiConnect({ connector: injectedConnector });
       }
     }
-  }, []);
+  }, [openConnectModal, connectors, wagmiConnect]);
 
-  const connectExtension = useCallback(async (): Promise<WalletAccountWithBalance> => {
-    setIsLoading(true);
-    setError(null);
-
-    try {
-      console.log('useOneChainWallet: Connecting to wallet extension...');
-      
-      // Use the proper wallet extension connection method
-      // This will set the connectedAccount in oneChainWalletStandardService
-      const extensionAccount = await oneChainService.connectWalletExtension();
-      
-      console.log('useOneChainWallet: Wallet connected:', extensionAccount.address);
-      
-      // Get balance
-      const balance = await oneChainService.getBalance(extensionAccount.address);
-      const accountWithBalance = { ...extensionAccount, balance };
-      
-      setAccount(accountWithBalance);
-      
-      // Save to localStorage
-      localStorage.setItem('onechain_wallet', JSON.stringify(accountWithBalance));
-      
-      console.log('useOneChainWallet: Connection complete and saved');
-      
-      return accountWithBalance;
-    } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Failed to connect wallet extension';
-      console.error('useOneChainWallet: Connection failed:', errorMessage);
-      setError(errorMessage);
-      throw new Error(errorMessage);
-    } finally {
-      setIsLoading(false);
-    }
-  }, []);
-
-  // Legacy connect method for backward compatibility - now just connects to extension
-  const connect = useCallback(async (): Promise<WalletAccountWithBalance> => {
-    return await connectExtension();
-  }, [connectExtension]);
-
+  // Disconnect function
   const disconnect = useCallback(() => {
-    setAccount(null);
-    localStorage.removeItem('onechain_wallet');
+    wagmiDisconnect();
     setError(null);
-    // No page reload - state updates automatically
-  }, []);
+  }, [wagmiDisconnect]);
 
-  const createWallet = useCallback(async (): Promise<WalletAccountWithBalance> => {
-    setIsLoading(true);
-    setError(null);
-
-    try {
-      const { keypair, address } = oneChainService.generateProgrammaticWallet();
-      const newAccount = { address, publicKey: keypair.getPublicKey().toBase64() };
-      
-      // Get balance
-      const balance = await oneChainService.getBalance(newAccount.address);
-      const accountWithBalance = { ...newAccount, balance };
-      
-      setAccount(accountWithBalance);
-      
-      // Save to localStorage
-      localStorage.setItem('onechain_wallet', JSON.stringify(accountWithBalance));
-      
-      return accountWithBalance;
-    } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Failed to create wallet';
-      setError(errorMessage);
-      throw new Error(errorMessage);
-    } finally {
-      setIsLoading(false);
-    }
-  }, []);
-
-  const importWallet = useCallback(async (privateKey: string): Promise<WalletAccountWithBalance> => {
-    setIsLoading(true);
-    setError(null);
-
-    try {
-      // For now, we'll create a new wallet instead of importing
-      // TODO: Implement proper private key import functionality
-      const { keypair, address } = oneChainService.generateProgrammaticWallet();
-      const importedAccount = { address, publicKey: keypair.getPublicKey().toBase64() };
-      
-      // Get balance
-      const balance = await oneChainService.getBalance(importedAccount.address);
-      const accountWithBalance = { ...importedAccount, balance };
-      
-      setAccount(accountWithBalance);
-      
-      // Save to localStorage
-      localStorage.setItem('onechain_wallet', JSON.stringify(accountWithBalance));
-      
-      return accountWithBalance;
-    } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Failed to import wallet';
-      setError(errorMessage);
-      throw new Error(errorMessage);
-    } finally {
-      setIsLoading(false);
-    }
-  }, []);
-
+  // Get balance function
   const getBalance = useCallback(async (): Promise<string> => {
-    if (!account) {
+    if (!address) {
       throw new Error('No wallet connected');
     }
 
-    setIsLoading(true);
     try {
-      const balance = await oneChainService.getBalance(account.address);
-      
-      // Update account with new balance
-      const updatedAccount = { ...account, balance };
-      setAccount(updatedAccount);
-      localStorage.setItem('onechain_wallet', JSON.stringify(updatedAccount));
-      
-      return balance;
+      const result = await refetchBalance();
+      if (result.data) {
+        return ethers.formatEther(result.data.value);
+      }
+      return '0';
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Failed to get balance';
       setError(errorMessage);
       throw new Error(errorMessage);
-    } finally {
-      setIsLoading(false);
     }
-  }, [account]);
+  }, [address, refetchBalance]);
 
-  const requestFromFaucet = useCallback(async (): Promise<boolean> => {
-    if (!account) {
-      throw new Error('No wallet connected');
+  // Get signer function for transactions
+  const getSigner = useCallback(async (): Promise<ethers.Signer | null> => {
+    if (!address || typeof window === 'undefined') {
+      return null;
     }
-
-    setIsLoading(true);
-    setError(null);
 
     try {
-      const success = await oneChainService.requestFromFaucet(account.address);
-      
-      if (success) {
-        // Refresh balance after faucet request
-        await getBalance();
+      // Get the provider from window.ethereum
+      if (window.ethereum) {
+        const provider = new ethers.BrowserProvider(window.ethereum);
+        const signer = await provider.getSigner();
+        return signer;
       }
-      
-      return success;
+      return null;
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Failed to request from faucet';
+      const errorMessage = err instanceof Error ? err.message : 'Failed to get signer';
       setError(errorMessage);
-      return false;
-    } finally {
-      setIsLoading(false);
+      return null;
     }
-  }, [account, getBalance]);
+  }, [address]);
 
-  const sendTransaction = useCallback(async (recipient: string, amount: string): Promise<string> => {
-    if (!account) {
-      throw new Error('No wallet connected');
+  // Switch to Mantle network
+  const switchToMantle = useCallback(async (): Promise<void> => {
+    if (typeof window === 'undefined' || !window.ethereum) {
+      throw new Error('No wallet provider found');
     }
-
-    setIsLoading(true);
-    setError(null);
 
     try {
-      const tx = await oneChainService.createTransaction(
-        account.address,
-        recipient,
-        amount
-      );
-      
-      // For now, return a placeholder transaction digest
-      // TODO: Implement proper transaction execution
-      const txDigest = 'placeholder-tx-digest';
-      
-      // Refresh balance after transaction
-      await getBalance();
-      
-      return txDigest;
-    } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Failed to send transaction';
-      setError(errorMessage);
-      throw new Error(errorMessage);
-    } finally {
-      setIsLoading(false);
+      // Try to switch to Mantle Sepolia Testnet
+      await window.ethereum.request({
+        method: 'wallet_switchEthereumChain',
+        params: [{ chainId: '0x138B' }], // 5003 in hex
+      });
+    } catch (switchError: any) {
+      // If the chain hasn't been added to the user's wallet, add it
+      if (switchError.code === 4902) {
+        try {
+          await window.ethereum.request({
+            method: 'wallet_addEthereumChain',
+            params: [
+              {
+                chainId: '0x138B', // 5003 in hex
+                chainName: 'Mantle Sepolia Testnet',
+                nativeCurrency: {
+                  name: 'MNT',
+                  symbol: 'MNT',
+                  decimals: 18,
+                },
+                rpcUrls: ['https://rpc.sepolia.mantle.xyz'],
+                blockExplorerUrls: ['https://explorer.sepolia.mantle.xyz'],
+              },
+            ],
+          });
+        } catch (addError) {
+          throw new Error('Failed to add Mantle network to wallet');
+        }
+      } else {
+        throw new Error('Failed to switch to Mantle network');
+      }
     }
-  }, [account, getBalance]);
+  }, []);
+
+  // Clear error when connection state changes
+  useEffect(() => {
+    if (isConnected) {
+      setError(null);
+    }
+  }, [isConnected]);
 
   return {
     account,
@@ -248,12 +157,16 @@ export const useOneChainWallet = (): UseOneChainWalletReturn => {
     isLoading,
     error,
     connect,
-    connectExtension,
     disconnect,
-    createWallet,
-    importWallet,
     getBalance,
-    requestFromFaucet,
-    sendTransaction,
+    getSigner,
+    switchToMantle,
   };
 };
+
+// Type declaration for window.ethereum
+declare global {
+  interface Window {
+    ethereum?: any;
+  }
+}

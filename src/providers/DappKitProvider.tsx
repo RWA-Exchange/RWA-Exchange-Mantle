@@ -1,31 +1,38 @@
 'use client';
 
-import { SuiClientProvider, WalletProvider } from '@mysten/dapp-kit';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { getDefaultConfig, RainbowKitProvider } from '@rainbow-me/rainbowkit';
+import { WagmiProvider } from 'wagmi';
+import { mantleSepoliaTestnet, mantle } from 'wagmi/chains';
+import { QueryClientProvider, QueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
-import '@mysten/dapp-kit/dist/index.css';
+import '@rainbow-me/rainbowkit/styles.css';
 
-// OneChain network configuration - EXACTLY like helper repo
-const ONECHAIN_RPC_URL = process.env.NEXT_PUBLIC_ONECHAIN_RPC_URL || 'https://rpc-testnet.onelabs.cc:443';
-const ONECHAIN_NETWORK = process.env.NEXT_PUBLIC_ONECHAIN_NETWORK || 'testnet';
+// Mantle network configuration
+const MANTLE_TESTNET_RPC_URL = process.env.NEXT_PUBLIC_MANTLE_TESTNET_RPC_URL || 'https://rpc.sepolia.mantle.xyz';
+const MANTLE_MAINNET_RPC_URL = process.env.NEXT_PUBLIC_MANTLE_MAINNET_RPC_URL || 'https://rpc.mantle.xyz';
+const WALLETCONNECT_PROJECT_ID = process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID || 'your_project_id_here';
 
-export function DappKitProvider({ children }: { children: React.ReactNode }) {
+// Configure chains
+const chains = [mantleSepoliaTestnet, mantle] as const;
+
+// Configure wagmi
+const config = getDefaultConfig({
+  appName: 'RWA Exchange Mantle',
+  projectId: WALLETCONNECT_PROJECT_ID,
+  chains,
+  ssr: true, // If your dApp uses server side rendering (SSR)
+});
+
+export function Web3Provider({ children }: { children: React.ReactNode }) {
   const [queryClient] = useState(() => new QueryClient());
 
-  // Simple network config like helper repo
-  const networks = {
-    [ONECHAIN_NETWORK]: {
-      url: ONECHAIN_RPC_URL,
-    },
-  };
-
   return (
-    <QueryClientProvider client={queryClient}>
-      <SuiClientProvider networks={networks} defaultNetwork={ONECHAIN_NETWORK}>
-        <WalletProvider autoConnect>
+    <WagmiProvider config={config}>
+      <QueryClientProvider client={queryClient}>
+        <RainbowKitProvider>
           {children}
-        </WalletProvider>
-      </SuiClientProvider>
-    </QueryClientProvider>
+        </RainbowKitProvider>
+      </QueryClientProvider>
+    </WagmiProvider>
   );
 }

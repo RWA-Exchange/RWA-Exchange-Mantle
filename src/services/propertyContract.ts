@@ -1,11 +1,8 @@
-import { SuiClient } from '@mysten/sui/client';
-import { Transaction } from '@mysten/sui/transactions';
+import { ethers } from 'ethers';
 import { logger } from '../utils/secureLogger';
 
-const RPC_URL = process.env.NEXT_PUBLIC_ONECHAIN_RPC_URL || '/api/onechain-proxy';
-const PACKAGE_ID = process.env.NEXT_PUBLIC_RWA_PACKAGE_ID || '0x7b8e0864967427679b4e129f79dc332a885c6087ec9e187b53451a9006ee15f2';
-// Old package ID for backward compatibility (properties created before the fix)
-const OLD_PACKAGE_ID = '0x7df89a7822e3ab90aab72de31cdecaf44886483b88770bbda1375a5dae3c2a3a';
+const RPC_URL = process.env.NEXT_PUBLIC_MANTLE_RPC_URL || 'https://rpc.sepolia.mantle.xyz';
+const CONTRACT_ADDRESS = process.env.NEXT_PUBLIC_PROPERTY_NFT_ADDRESS || '';
 
 export interface PropertyData {
   name: string;
@@ -21,63 +18,332 @@ export interface PropertyData {
 
 export interface CreatePropertyResult {
   success: boolean;
-  transactionDigest?: string;
-  propertyId?: string;
+  transactionHash?: string;
+  propertyId?: number;
   error?: string;
 }
 
 export interface InvestResult {
   success: boolean;
-  transactionDigest?: string;
-  investmentId?: string;
+  transactionHash?: string;
   sharesPurchased?: number;
   error?: string;
 }
 
 export interface TransferResult {
   success: boolean;
-  transactionDigest?: string;
+  transactionHash?: string;
   error?: string;
 }
 
+// Property NFT ABI (essential functions only)
+const PROPERTY_NFT_ABI = [
+  "function createProperty(string name, string description, string imageUrl, string location, string propertyType, uint256 totalValue, uint256 totalShares, uint256 pricePerShare, string rentalYield, string tokenURI) returns (uint256)",
+  "function invest(uint256 propertyId, uint256 sharesToBuy) payable",
+  "function transferShares(uint256 propertyId, address to, uint256 shares)",
+  "function claimDividends(uint256 propertyId)",
+  "function distributeDividends(uint256 propertyId) payable",
+  "function getPropertyInfo(uint256 propertyId) view returns (string, string, string, string, string, uint256, uint256, uint256, uint256, string, bool, address)",
+  "function getUserShares(uint256 propertyId, address user) view returns (uint256)",
+  "function getTreasuryBalance(uint256 propertyId) view returns (uint256)",
+  "function getUserInvestments(address user) view returns (uint256[])",
+  "event PropertyCreated(uint256 indexed propertyId, string name, uint256 totalValue, uint256 totalShares, uint256 pricePerShare, address indexed owner)",
+  "event InvestmentMade(uint256 indexed propertyId, address indexed investor, uint256 sharesPurchased, uint256 amountPaid, uint256 timestamp)",
+  "event InvestmentTransferred(uint256 indexed propertyId, address indexed from, address indexed to, uint256 shares)"
+];
+
 export class PropertyContractService {
-  private client: SuiClient;
+  private provider: ethers.JsonRpcProvider;
+  private contract: ethers.Contract;
 
   constructor() {
-    this.client = new SuiClient({ url: RPC_URL });
+    this.provider = new ethers.JsonRpcProvider(RPC_URL);
+    this.contract = new ethers.Contract(CONTRACT_ADDRESS, PROPERTY_NFT_ABI, this.provider);
   }
 
   /**
-   * Create a new property NFT on the blockchain using dapp-kit
-   * This is the recommended approach - much simpler and more reliable
+   * Create a new property NFT on Mantle blockchain
    */
   async createProperty(
     propertyData: PropertyData,
-    signAndExecuteTransaction: (tx: Transaction) => Promise<any>
+    signer: ethers.Signer,
+    tokenURI: string = ''
   ): Promise<CreatePropertyResult> {
     try {
-      logger.property('Creating NFT transaction', { name: propertyData.name });
+      logger.property('Creating property NFT transaction', { name: propertyData.name });
       
-      // Create transaction
-      const tx = new Transaction();
+      // Connect contract with signer
+      const contractWithSigner = this.contract.connect(signer);
+      
+      // Call createProperty function
+      const tx = await contractWithSigner.createProperty(
+        propertyData.name,
+        propertyData.description,
+        propertyData.imageUrl,
+        propertyData.location,
+        propertyData.propertyType,
+        ethers.parseEther(propertyData.totalValue.toString()),
+        propertyData.totalShares,
+        ethers.parseEther(propertyData.pricePerShare.toString()),
+        propertyData.rentalYield,
+        tokenURI
+      );
 
-      // Call the create_property function
-      tx.moveCall({
-        target: `${PACKAGE_ID}::property_nft::create_property`,
-        arguments: [
-          tx.pure.string(propertyData.name),
-          tx.pure.string(propertyData.description),
-          tx.pure.string(propertyData.imageUrl),
-          tx.pure.string(propertyData.location),
-          tx.pure.string(propertyData.propertyType),
-          tx.pure.u64(propertyData.totalValue),
-          tx.pure.u64(propertyData.totalShares),
-          tx.pure.u64(propertyData.pricePerShare),
-          tx.pure.string(propertyData.rentalYield),
-        ],
+      logger.property('Transaction sent', { hash: tx.hash });
+      
+      // Wait for transaction confirmation
+      const receipt = await tx.wait();
+      
+      if (receipt?.status === 1) {
+        // Extract property ID from events
+        const propertyCreatedEvent = receipt.logs.find((log: any) => {
+          try {
+            const parsed = this.contract.interface.parseLog(log);
+            return parsed?.name === 'PropertyCreated';
+          } catch {
+            return false;
+          }
+        });
+
+        let propertyId;
+        if (propertyCreatedEvent) {
+          const parsed = this.contract.interface.parseLog(propertyCreatedEvent);
+          propertyId = parsed?.args?.propertyId?.toString();
+        }
+
+        logger.property('Property created successfully', { 
+          hash: receipt.transactionHash,
+          propertyId 
+        });
+
+        return {
+          success: true,
+          transactionHash: receipt.transactionHash,
+          propertyId: propertyId ? parseInt(propertyId) : undefined
+        };
+      } else {
+        throw new Error('Transaction failed');
+      }
+
+    } catch (error: any) {
+      logger.error('Property creation failed', { error: error.message });
+      return {
+        success: false,
+        error: error.message || 'Failed to create property'
+      };
+    }
+  }
+
+  /**
+   * Invest in a property by purchasing shares with MNT
+   */
+  async invest(
+    propertyId: number,
+    sharesToBuy: number,
+    pricePerShare: string,
+    signer: ethers.Signer
+  ): Promise<InvestResult> {
+    try {
+      logger.property('Creating investment transaction', { propertyId, sharesToBuy });
+      
+      // Connect contract with signer
+      const contractWithSigner = this.contract.connect(signer);
+      
+      // Calculate total cost in MNT
+      const totalCost = ethers.parseEther((parseFloat(pricePerShare) * sharesToBuy).toString());
+      
+      // Call invest function with MNT payment
+      const tx = await contractWithSigner.invest(propertyId, sharesToBuy, {
+        value: totalCost
       });
 
-      // Let dapp-kit handle gas budget automatically for better compatibility
+      logger.property('Investment transaction sent', { hash: tx.hash });
+      
+      // Wait for transaction confirmation
+      const receipt = await tx.wait();
+      
+      if (receipt?.status === 1) {
+        logger.property('Investment successful', { 
+          hash: receipt.transactionHash,
+          propertyId,
+          shares: sharesToBuy 
+        });
+
+        return {
+          success: true,
+          transactionHash: receipt.transactionHash,
+          sharesPurchased: sharesToBuy
+        };
+      } else {
+        throw new Error('Transaction failed');
+      }
+
+    } catch (error: any) {
+      logger.error('Investment failed', { error: error.message });
+      return {
+        success: false,
+        error: error.message || 'Failed to invest in property'
+      };
+    }
+  }
+
+  /**
+   * Transfer shares to another address
+   */
+  async transferShares(
+    propertyId: number,
+    toAddress: string,
+    shares: number,
+    signer: ethers.Signer
+  ): Promise<TransferResult> {
+    try {
+      logger.property('Creating share transfer transaction', { propertyId, toAddress, shares });
+      
+      // Connect contract with signer
+      const contractWithSigner = this.contract.connect(signer);
+      
+      // Call transferShares function
+      const tx = await contractWithSigner.transferShares(propertyId, toAddress, shares);
+
+      logger.property('Transfer transaction sent', { hash: tx.hash });
+      
+      // Wait for transaction confirmation
+      const receipt = await tx.wait();
+      
+      if (receipt?.status === 1) {
+        logger.property('Share transfer successful', { 
+          hash: receipt.transactionHash,
+          propertyId,
+          shares 
+        });
+
+        return {
+          success: true,
+          transactionHash: receipt.transactionHash
+        };
+      } else {
+        throw new Error('Transaction failed');
+      }
+
+    } catch (error: any) {
+      logger.error('Share transfer failed', { error: error.message });
+      return {
+        success: false,
+        error: error.message || 'Failed to transfer shares'
+      };
+    }
+  }
+
+  /**
+   * Get property information from blockchain
+   */
+  async getPropertyInfo(propertyId: number) {
+    try {
+      const result = await this.contract.getPropertyInfo(propertyId);
+      
+      return {
+        name: result[0],
+        description: result[1],
+        imageUrl: result[2],
+        location: result[3],
+        propertyType: result[4],
+        totalValue: ethers.formatEther(result[5]),
+        totalShares: result[6].toString(),
+        availableShares: result[7].toString(),
+        pricePerShare: ethers.formatEther(result[8]),
+        rentalYield: result[9],
+        isActive: result[10],
+        owner: result[11]
+      };
+    } catch (error: any) {
+      logger.error('Failed to get property info', { error: error.message, propertyId });
+      throw error;
+    }
+  }
+
+  /**
+   * Get user's shares in a property
+   */
+  async getUserShares(propertyId: number, userAddress: string): Promise<number> {
+    try {
+      const shares = await this.contract.getUserShares(propertyId, userAddress);
+      return parseInt(shares.toString());
+    } catch (error: any) {
+      logger.error('Failed to get user shares', { error: error.message, propertyId, userAddress });
+      return 0;
+    }
+  }
+
+  /**
+   * Get user's investment portfolio
+   */
+  async getUserInvestments(userAddress: string): Promise<number[]> {
+    try {
+      const investments = await this.contract.getUserInvestments(userAddress);
+      return investments.map((id: any) => parseInt(id.toString()));
+    } catch (error: any) {
+      logger.error('Failed to get user investments', { error: error.message, userAddress });
+      return [];
+    }
+  }
+
+  /**
+   * Get treasury balance for a property
+   */
+  async getTreasuryBalance(propertyId: number): Promise<string> {
+    try {
+      const balance = await this.contract.getTreasuryBalance(propertyId);
+      return ethers.formatEther(balance);
+    } catch (error: any) {
+      logger.error('Failed to get treasury balance', { error: error.message, propertyId });
+      return '0';
+    }
+  }
+
+  /**
+   * Claim dividends for a property investment
+   */
+  async claimDividends(propertyId: number, signer: ethers.Signer): Promise<TransferResult> {
+    try {
+      logger.property('Claiming dividends', { propertyId });
+      
+      // Connect contract with signer
+      const contractWithSigner = this.contract.connect(signer);
+      
+      // Call claimDividends function
+      const tx = await contractWithSigner.claimDividends(propertyId);
+
+      logger.property('Claim dividends transaction sent', { hash: tx.hash });
+      
+      // Wait for transaction confirmation
+      const receipt = await tx.wait();
+      
+      if (receipt?.status === 1) {
+        logger.property('Dividends claimed successfully', { 
+          hash: receipt.transactionHash,
+          propertyId 
+        });
+
+        return {
+          success: true,
+          transactionHash: receipt.transactionHash
+        };
+      } else {
+        throw new Error('Transaction failed');
+      }
+
+    } catch (error: any) {
+      logger.error('Dividend claim failed', { error: error.message });
+      return {
+        success: false,
+        error: error.message || 'Failed to claim dividends'
+      };
+    }
+  }
+}
+
+// Export singleton instance
+export const propertyContractService = new PropertyContractService();
       logger.info('Letting dapp-kit handle gas budget automatically');
 
       // Execute transaction using dapp-kit

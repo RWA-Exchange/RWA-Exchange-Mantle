@@ -1,13 +1,13 @@
 import type { Metadata } from "next";
 import { Providers } from "@/components/shared/Providers";
-import { DappKitProvider } from "@/providers/DappKitProvider";
+import { Web3Provider } from "@/providers/DappKitProvider";
 import { Navbar } from "@/components/shared/Navbar";
 import { Footer } from "@/components/shared/Footer";
 
 export const metadata: Metadata = {
-	title: "RWA ExChange",
+	title: "RWA Exchange Mantle",
 	description:
-		"Trade tokenized real-world assets like real estate, art, and collectibles.",
+		"Trade tokenized real-world assets like real estate, art, and collectibles on Mantle Network.",
 };
 
 export default function RootLayout({
@@ -26,13 +26,13 @@ export default function RootLayout({
 				/>
 			</head>
 			<body suppressHydrationWarning={true} style={{ fontFamily: "Inter, sans-serif" }}>
-				<DappKitProvider>
+				<Web3Provider>
 					<Providers>
 						<Navbar />
 						{children}
 						<Footer />
 					</Providers>
-				</DappKitProvider>
+				</Web3Provider>
 			</body>
 		</html>
 	);
