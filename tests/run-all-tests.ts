@@ -1,0 +1,231 @@
+/**
+ * Test Runner Script
+ * Runs all tests and generates comprehensive reports
+ */
+
+import { execSync } from 'child_process';
+import fs from 'fs';
+import path from 'path';
+
+interface TestResult {
+  suite: string;
+  passed: boolean;
+  coverage?: number;
+  errors?: string[];
+}
+
+class TestRunner {
+  private results: TestResult[] = [];
+
+  async runAllTests(): Promise<void> {
+    console.log('🧪 Starting Phase 2 Test Suite...\n');
+
+    // Run unit tests
+    await this.runUnitTests();
+    
+    // Run component tests
+    await this.runComponentTests();
+    
+    // Run security tests
+    await this.runSecurityTests();
+    
+    // Generate coverage report
+    await this.generateCoverageReport();
+    
+    // Generate final report
+    this.generateFinalReport();
+  }
+
+  private async runUnitTests(): Promise<void> {
+    console.log('📋 Running Unit Tests...');
+    try {
+      const output = execSync('npm run test -- tests/property-contract.test.ts', { 
+        encoding: 'utf8',
+        stdio: 'pipe'
+      });
+      
+      this.results.push({
+        suite: 'Unit Tests',
+        passed: true,
+        coverage: this.extractCoverage(output)
+      });
+      
+      console.log('✅ Unit Tests: PASSED\n');
+    } catch (error: any) {
+      this.results.push({
+        suite: 'Unit Tests',
+        passed: false,
+        errors: [error.message]
+      });
+      
+      console.log('❌ Unit Tests: FAILED\n');
+    }
+  }
+
+  private async runComponentTests(): Promise<void> {
+    console.log('🧩 Running Component Tests...');
+    try {
+      const output = execSync('npm run test -- tests/components.test.tsx', { 
+        encoding: 'utf8',
+        stdio: 'pipe'
+      });
+      
+      this.results.push({
+        suite: 'Component Tests',
+        passed: true,
+        coverage: this.extractCoverage(output)
+      });
+      
+      console.log('✅ Component Tests: PASSED\n');
+    } catch (error: any) {
+      this.results.push({
+        suite: 'Component Tests',
+        passed: false,
+        errors: [error.message]
+      });
+      
+      console.log('❌ Component Tests: FAILED\n');
+    }
+  }
+
+  private async runSecurityTests(): Promise<void> {
+    console.log('🔒 Running Security Tests...');
+    
+    // Check for console.log statements with sensitive data
+    const securityIssues = this.checkSecurityIssues();
+    
+    if (securityIssues.length === 0) {
+      this.results.push({
+        suite: 'Security Tests',
+        passed: true
+      });
+      
+      console.log('✅ Security Tests: PASSED\n');
+    } else {
+      this.results.push({
+        suite: 'Security Tests',
+        passed: false,
+        errors: securityIssues
+      });
+      
+      console.log('❌ Security Tests: FAILED\n');
+      securityIssues.forEach(issue => console.log(`   - ${issue}`));
+    }
+  }
+
+  private checkSecurityIssues(): string[] {
+    const issues: string[] = [];
+    const srcDir = path.join(process.cwd(), 'src');
+    
+    // Check for unsafe console.log statements
+    const files = this.getAllFiles(srcDir, ['.ts', '.tsx']);
+    
+    files.forEach(file => {
+      const content = fs.readFileSync(file, 'utf8');
+      const lines = content.split('\n');
+      
+      lines.forEach((line, index) => {
+        // Check for console.log with potential sensitive data
+        if (line.includes('console.log') && !line.includes('logger.')) {
+          // Check if it might contain sensitive data
+          if (line.match(/0x[a-fA-F0-9]{40,64}|digest|objectId|private|secret/i)) {
+            issues.push(`${file}:${index + 1} - Potential sensitive data in console.log`);
+          }
+        }
+      });
+    });
+    
+    return issues;
+  }
+
+  private getAllFiles(dir: string, extensions: string[]): string[] {
+    const files: string[] = [];
+    
+    const items = fs.readdirSync(dir);
+    
+    items.forEach(item => {
+      const fullPath = path.join(dir, item);
+      const stat = fs.statSync(fullPath);
+      
+      if (stat.isDirectory() && !item.startsWith('.') && item !== 'node_modules') {
+        files.push(...this.getAllFiles(fullPath, extensions));
+      } else if (stat.isFile() && extensions.some(ext => item.endsWith(ext))) {
+        files.push(fullPath);
+      }
+    });
+    
+    return files;
+  }
+
+  private async generateCoverageReport(): Promise<void> {
+    console.log('📊 Generating Coverage Report...');
+    try {
+      execSync('npm run test:coverage', { stdio: 'pipe' });
+      console.log('✅ Coverage Report Generated\n');
+    } catch (error) {
+      console.log('⚠️ Coverage Report Generation Failed\n');
+    }
+  }
+
+  private extractCoverage(output: string): number {
+    const coverageMatch = output.match(/All files\s+\|\s+(\d+\.?\d*)/);
+    return coverageMatch ? parseFloat(coverageMatch[1]) : 0;
+  }
+
+  private generateFinalReport(): void {
+    console.log('📋 Phase 2 Test Results Summary');
+    console.log('================================\n');
+    
+    let allPassed = true;
+    let totalCoverage = 0;
+    let coverageCount = 0;
+    
+    this.results.forEach(result => {
+      const status = result.passed ? '✅ PASSED' : '❌ FAILED';
+      const coverage = result.coverage ? ` (${result.coverage}% coverage)` : '';
+      
+      console.log(`${result.suite}: ${status}${coverage}`);
+      
+      if (result.errors) {
+        result.errors.forEach(error => {
+          console.log(`   - ${error}`);
+        });
+      }
+      
+      if (!result.passed) allPassed = false;
+      if (result.coverage) {
+        totalCoverage += result.coverage;
+        coverageCount++;
+      }
+    });
+    
+    const avgCoverage = coverageCount > 0 ? totalCoverage / coverageCount : 0;
+    
+    console.log('\n================================');
+    console.log(`Overall Status: ${allPassed ? '✅ ALL TESTS PASSED' : '❌ SOME TESTS FAILED'}`);
+    console.log(`Average Coverage: ${avgCoverage.toFixed(1)}%`);
+    
+    if (allPassed && avgCoverage >= 80) {
+      console.log('\n🎉 Phase 2 Requirements Met!');
+      console.log('✅ All tests passing');
+      console.log('✅ Security requirements satisfied');
+      console.log('✅ Coverage targets achieved');
+    } else {
+      console.log('\n⚠️ Phase 2 Requirements Not Met');
+      if (!allPassed) console.log('❌ Some tests are failing');
+      if (avgCoverage < 80) console.log('❌ Coverage below 80% target');
+    }
+    
+    console.log('\n📁 Reports generated in:');
+    console.log('   - coverage/index.html (Coverage Report)');
+    console.log('   - phase2-plan/SECURITY_DOCUMENTATION.md (Security Docs)');
+  }
+}
+
+// Run tests if called directly
+if (require.main === module) {
+  const runner = new TestRunner();
+  runner.runAllTests().catch(console.error);
+}
+
+export { TestRunner };
