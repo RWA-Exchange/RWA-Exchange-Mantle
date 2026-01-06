@@ -5,7 +5,7 @@ import { Navbar } from "@/components/shared/Navbar";
 import { Footer } from "@/components/shared/Footer";
 
 export const metadata: Metadata = {
-	title: "RWA Exchange Mantle",
+	title: "MantleRWA",
 	description:
 		"Trade tokenized real-world assets like real estate, art, and collectibles on Mantle Network.",
 };

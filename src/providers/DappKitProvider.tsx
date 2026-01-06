@@ -17,7 +17,7 @@ const chains = [mantleSepoliaTestnet, mantle] as const;
 
 // Configure wagmi
 const config = getDefaultConfig({
-  appName: 'RWA Exchange Mantle',
+  appName: 'MantleRWA',
   projectId: WALLETCONNECT_PROJECT_ID,
   chains,
   ssr: true, // If your dApp uses server side rendering (SSR)

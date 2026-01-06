@@ -4,7 +4,7 @@
 
 export const MANTLE_NETWORKS = {
   testnet: {
-    chainId: 5003,
+    chainId: 5001,
     name: 'Mantle Sepolia Testnet',
     rpcUrl: 'https://rpc.sepolia.mantle.xyz',
     explorerUrl: 'https://explorer.sepolia.mantle.xyz',

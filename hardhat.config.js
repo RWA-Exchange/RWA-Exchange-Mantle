@@ -24,7 +24,7 @@ module.exports = {
     // Mantle Testnet
     mantle_testnet: {
       url: process.env.MANTLE_TESTNET_RPC_URL || "https://rpc.sepolia.mantle.xyz",
-      chainId: 5003,
+      chainId: 5001,
       accounts: process.env.PRIVATE_KEY ? [process.env.PRIVATE_KEY] : [],
       timeout: 60000,
       gasPrice: 20000000000, // 20 gwei
@@ -52,7 +52,7 @@ module.exports = {
     customChains: [
       {
         network: "mantle_testnet",
-        chainId: 5003,
+        chainId: 5001,
         urls: {
           apiURL: process.env.MANTLE_TESTNET_EXPLORER_API || "https://explorer.sepolia.mantle.xyz/api",
           browserURL: process.env.MANTLE_TESTNET_EXPLORER || "https://explorer.sepolia.mantle.xyz"

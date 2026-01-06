@@ -1,7 +1,7 @@
 
 <div align="center">
 
-  <h1>🏠 RWA Exchange Mantle</h1>
+  <h1>🏠 MantleRWA Marketplace</h1>
   
   <p><strong>A decentralized marketplace for tokenized Real-World Assets (RWA) with fractional ownership on Mantle Network.</strong></p>
   
@@ -12,7 +12,7 @@
     <a href="https://www.typescriptlang.org/" target="_blank"><img src="https://img.shields.io/badge/TypeScript-5-3178C6?logo=typescript&logoColor=white" alt="TypeScript" /></a>
     <a href="https://chakra-ui.com/" target="_blank"><img src="https://img.shields.io/badge/Chakra%20UI-2-319795?logo=chakraui&logoColor=white" alt="Chakra UI" /></a>
     <a href="https://soliditylang.org/" target="_blank"><img src="https://img.shields.io/badge/Solidity-0.8.24-363636?logo=solidity&logoColor=white" alt="Solidity" /></a>
-    <a href="https://mantle.xyz/" target="_blank"><img src="https://img.shields.io/badge/Mantle-Testnet-00D4AA?logo=ethereum&logoColor=white" alt="Mantle" /></a>
+    <a href="https://mantle.xyz/" target="_blank"><img src="https://img.shields.io/badge/Mantle-Network-00D4AA?logo=ethereum&logoColor=white" alt="Mantle" /></a>
     <a href="https://rainbowkit.com/" target="_blank"><img src="https://img.shields.io/badge/RainbowKit-2.1-FF6B6B?logo=rainbow&logoColor=white" alt="RainbowKit" /></a>
   </p>
 </div>
