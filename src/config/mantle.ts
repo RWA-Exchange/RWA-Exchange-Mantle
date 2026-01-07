@@ -4,7 +4,7 @@
 
 export const MANTLE_NETWORKS = {
   testnet: {
-    chainId: 5001,
+    chainId: 5003,
     name: 'Mantle Sepolia Testnet',
     rpcUrl: 'https://rpc.sepolia.mantle.xyz',
     explorerUrl: 'https://sepolia.mantlescan.xyz',
@@ -49,7 +49,8 @@ export function getNetworkConfig(chainId: number) {
 }
 
 export function getContractAddress(chainId: number, contractName: keyof typeof CONTRACT_ADDRESSES[5003]) {
-  return CONTRACT_ADDRESSES[chainId as keyof typeof CONTRACT_ADDRESSES]?.[contractName] || '';
+  const addresses = CONTRACT_ADDRESSES[chainId as keyof typeof CONTRACT_ADDRESSES];
+  return (addresses as any)?.[contractName] || '';
 }
 
 export function isMantle(chainId: number): boolean {

@@ -5,7 +5,7 @@ import { propertyContractService } from '@/services/propertyContract';
 import { useAccount } from 'wagmi';
 import { useEthersSigner } from '@/hooks/useEthersSigner';
 import { NftContract } from '@/consts/nft_contracts';
-import { WalletSyncUtil } from '@/utils/walletSync';
+
 
 export interface MarketplaceAsset {
   id: string;
