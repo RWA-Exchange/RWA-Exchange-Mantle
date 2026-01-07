@@ -1,4 +1,4 @@
-// OneChain NFT contract configuration
+// Mantle NFT contract configuration
 
 export type ChainInfo = {
   id: number;
@@ -18,23 +18,23 @@ export type NftContract = {
   chain: ChainInfo;
 };
 
-// OneChain network configuration
-export const ONECHAIN_TESTNET: ChainInfo = {
+// Mantle network configuration
+export const Mantle_TESTNET: ChainInfo = {
   id: 1001,
-  name: "OneChain Testnet",
+  name: "Mantle Testnet",
   symbol: "ONE",
   rpcUrl: "https://rpc-testnet.onelabs.cc",
 };
 
-export const ONECHAIN_MAINNET: ChainInfo = {
+export const Mantle_MAINNET: ChainInfo = {
   id: 1000,
-  name: "OneChain",
+  name: "Mantle",
   symbol: "ONE",
   rpcUrl: "https://rpc-mainnet.onelabs.cc:443",
 };
 
 /**
- * NFT contracts supported by the OneChain marketplace
+ * NFT contracts supported by the Mantle marketplace
  * NO MOCK DATA - Only real blockchain properties will be shown
  */
 export const NFT_CONTRACTS: NftContract[] = [];

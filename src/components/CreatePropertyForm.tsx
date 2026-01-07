@@ -35,14 +35,16 @@ import {
   FormErrorMessage,
 } from "@chakra-ui/react";
 import { useState, useEffect } from "react";
-import { useDappKit } from "@/hooks/useDappKit";
+import { useAccount } from "wagmi";
+import { useEthersSigner } from "@/hooks/useEthersSigner";
 import { propertyContractService, PropertyData } from "@/services/propertyContract";
 import { useRouter } from "next/navigation";
 import { FiCheck, FiAlertCircle, FiImage, FiDollarSign, FiHome, FiCheckCircle } from "react-icons/fi";
 import { FaTwitter, FaCopy } from "react-icons/fa";
 
 export function CreatePropertyForm() {
-  const { account, isConnected, signAndExecuteTransaction } = useDappKit();
+  const { isConnected, address } = useAccount();
+  const signer = useEthersSigner();
   const toast = useToast();
   const router = useRouter();
   const { isOpen: isSuccessOpen, onOpen: onSuccessOpen, onClose: onSuccessClose } = useDisclosure();
@@ -145,7 +147,7 @@ export function CreatePropertyForm() {
   };
 
   const handleSubmit = async () => {
-    if (!isConnected || !account) {
+    if (!isConnected || !address || !signer) {
       toast({
         title: "Wallet Not Connected",
         description: "Please connect your wallet first",
@@ -180,13 +182,13 @@ export function CreatePropertyForm() {
 
       const result = await propertyContractService.createProperty(
         propertyData,
-        signAndExecuteTransaction
+        signer
       );
 
       setProgress(90);
 
       if (result.success) {
-        setTransactionHash(result.transactionDigest || "");
+        setTransactionHash(result.transactionHash || "");
         setProgress(100);
 
         // Show success modal with confetti
@@ -233,7 +235,7 @@ export function CreatePropertyForm() {
   };
 
   const shareOnTwitter = () => {
-    const text = `I just tokenized a property on @OneRWA! 🏠✨ Check it out on OneChain blockchain.`;
+    const text = `I just tokenized a property on @MantleRWA! 🏠✨ Check it out on Mantle blockchain.`;
     window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}`, "_blank");
   };
 
@@ -626,9 +628,9 @@ export function CreatePropertyForm() {
               <HStack>
                 <Icon as={FiAlertCircle} color="blue.500" />
                 <VStack align="start" spacing={0}>
-                  <Text fontSize="sm" fontWeight="600">Transaction Fee: ~0.05 OCT</Text>
+                  <Text fontSize="sm" fontWeight="600">Transaction Fee: ~0.05 MNT</Text>
                   <Text fontSize="xs" color="gray.600" _dark={{ color: "gray.400" }}>
-                    Your property will be minted as an NFT on OneChain
+                    Your property will be minted as an NFT on Mantle
                   </Text>
                 </VStack>
               </HStack>
@@ -746,7 +748,7 @@ export function CreatePropertyForm() {
           <ModalBody py={8} px={8}>
             <VStack spacing={5}>
               <Text textAlign="center" fontSize="md" color="gray.600" _dark={{ color: "gray.400" }}>
-                Your property NFT has been minted on OneChain blockchain!
+                Your property NFT has been minted on Mantle blockchain!
               </Text>
 
               {transactionHash && (
@@ -790,7 +792,7 @@ export function CreatePropertyForm() {
             <VStack spacing={3} w="full">
               <Button
                 as="a"
-                href={`https://onescan.cc/testnet/transactionBlocksDetail?digest=${transactionHash}`}
+                href={`https://sepolia.mantlescan.xyz/tx/${transactionHash}`}
                 target="_blank"
                 w="full"
                 h="56px"
@@ -803,7 +805,7 @@ export function CreatePropertyForm() {
                   transform: "translateY(-2px)",
                 }}
               >
-                View on OneScan
+                View on Explorer
               </Button>
               <Button
                 onClick={() => {

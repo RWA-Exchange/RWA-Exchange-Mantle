@@ -23,7 +23,7 @@ import { keyframes } from "@emotion/react";
 import { FaArrowRight, FaChartLine, FaGlobe, FaShieldAlt, FaLock, FaRocket, FaCoins, FaCheckCircle } from "react-icons/fa";
 import { FiAlertCircle, FiTrendingUp, FiUsers, FiZap, FiCheck, FiX } from "react-icons/fi";
 import { motion } from "framer-motion";
-import { useDappKit } from "@/hooks/useDappKit";
+import { useAccount } from "wagmi";
 import { useRouter } from "next/navigation";
 
 const MotionBox = motion(Box);
@@ -55,7 +55,7 @@ const rotate = keyframes`
 `;
 
 export default function Home() {
-  const { isConnected } = useDappKit();
+  const { isConnected } = useAccount();
   const router = useRouter();
 
   const handleAssetClick = (e: React.MouseEvent, path: string) => {
@@ -197,7 +197,7 @@ export default function Home() {
                 color="whiteAlpha.900"
               >
                 Invest in tokenized real estate, premium commodities, and exclusive assets.
-                Built on OneChain for secure, transparent, and compliant transactions.
+                Built on Mantle for secure, transparent, and compliant transactions.
               </Text>
             </MotionBox>
 
@@ -316,7 +316,7 @@ export default function Home() {
                 bgGradient="linear(to-r, purple.600, blue.500)"
                 bgClip="text"
               >
-                Why Choose OneRWA?
+                Why Choose MantleRWA?
               </Heading>
               <Text fontSize="xl" color={textColor} maxW="3xl" lineHeight="1.8">
                 The most advanced platform for tokenizing and trading real-world assets
@@ -337,7 +337,7 @@ export default function Home() {
               {
                 icon: FaShieldAlt,
                 label: "Blockchain Secured",
-                desc: "Military-grade security on OneChain",
+                desc: "Military-grade security on Mantle",
                 color: "blue",
                 gradient: "linear(to-br, blue.400, blue.600)"
               },
@@ -441,7 +441,7 @@ export default function Home() {
                 bgGradient="linear(to-r, purple.600, blue.500)"
                 bgClip="text"
               >
-                How OneRWA Works
+                How MantleRWA Works
               </Heading>
               <Text fontSize="xl" color={textColor} maxW="3xl" lineHeight="1.8">
                 Start investing in real-world assets in three simple steps.
@@ -455,7 +455,7 @@ export default function Home() {
               {
                 step: "01",
                 title: "Connect Wallet",
-                description: "Connect your OneChain wallet securely. New to crypto? Create a wallet in under 2 minutes.",
+                description: "Connect your Mantle wallet securely. New to crypto? Create a wallet in under 2 minutes.",
                 icon: FaRocket,
                 color: "purple"
               },
@@ -643,7 +643,7 @@ export default function Home() {
             {/* Security Badges Grid */}
             <SimpleGrid columns={{ base: 2, md: 3, lg: 6 }} spacing={8}>
               {[
-                { label: "OneChain\nSecured", icon: FaShieldAlt, color: "purple" },
+                { label: "Mantle\nSecured", icon: FaShieldAlt, color: "purple" },
                 { label: "Smart Contract\nAudited", icon: FaCheckCircle, color: "green" },
                 { label: "SEC\nCompliant", icon: FaCheckCircle, color: "blue" },
                 { label: "Bank-Grade\nEncryption", icon: FaLock, color: "orange" },

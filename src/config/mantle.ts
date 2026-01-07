@@ -7,7 +7,7 @@ export const MANTLE_NETWORKS = {
     chainId: 5001,
     name: 'Mantle Sepolia Testnet',
     rpcUrl: 'https://rpc.sepolia.mantle.xyz',
-    explorerUrl: 'https://explorer.sepolia.mantle.xyz',
+    explorerUrl: 'https://sepolia.mantlescan.xyz',
     faucetUrl: 'https://faucet.sepolia.mantle.xyz',
     nativeCurrency: {
       name: 'MNT',

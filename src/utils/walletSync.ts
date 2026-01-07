@@ -1,4 +1,4 @@
-import { oneChainWalletStandardService } from '@/services/onechain-wallet-standard';
+import { MantleWalletStandardService } from '@/services/Mantle-wallet-standard';
 
 /**
  * Utility to synchronize wallet connection state across different parts of the app
@@ -10,17 +10,17 @@ export class WalletSyncUtil {
   static async isWalletConnected(): Promise<boolean> {
     try {
       // Check service connection state
-      const serviceConnected = oneChainWalletStandardService.isConnected();
-      
+      const serviceConnected = MantleWalletStandardService.isConnected();
+
       // Check if we have a connected account
-      const connectedAccount = oneChainWalletStandardService.getConnectedAccount();
-      
+      const connectedAccount = MantleWalletStandardService.getConnectedAccount();
+
       // Check if wallet extension is available
-      const walletAvailable = oneChainWalletStandardService.isWalletExtensionAvailable();
-      
+      const walletAvailable = MantleWalletStandardService.isWalletExtensionAvailable();
+
       // Refresh connection state to ensure it's current
-      const connectionRefreshed = await oneChainWalletStandardService.refreshConnectionState();
-      
+      const connectionRefreshed = await MantleWalletStandardService.refreshConnectionState();
+
       return serviceConnected && !!connectedAccount && walletAvailable && connectionRefreshed;
     } catch (error) {
       console.error('Error checking wallet connection:', error);
@@ -36,8 +36,8 @@ export class WalletSyncUtil {
     if (!isConnected) {
       return null;
     }
-    
-    return oneChainWalletStandardService.getConnectedAccount();
+
+    return MantleWalletStandardService.getConnectedAccount();
   }
 
   /**
@@ -46,18 +46,18 @@ export class WalletSyncUtil {
   static async attemptReconnection(): Promise<boolean> {
     try {
       // Check if wallet extension is available
-      if (!oneChainWalletStandardService.isWalletExtensionAvailable()) {
+      if (!MantleWalletStandardService.isWalletExtensionAvailable()) {
         throw new Error('Wallet extension not available');
       }
 
       // Try to refresh connection state first
-      const refreshed = await oneChainWalletStandardService.refreshConnectionState();
+      const refreshed = await MantleWalletStandardService.refreshConnectionState();
       if (refreshed) {
         return true;
       }
 
       // If refresh failed, try to reconnect
-      const account = await oneChainWalletStandardService.connectWalletExtension();
+      const account = await MantleWalletStandardService.connectWalletExtension();
       return !!account;
     } catch (error) {
       console.error('Failed to reconnect wallet:', error);
@@ -71,11 +71,11 @@ export class WalletSyncUtil {
   static async validateConnectionForTransaction(): Promise<{ isValid: boolean; account: any; error?: string; capabilities?: any }> {
     try {
       const isConnected = await this.isWalletConnected();
-      
+
       if (!isConnected) {
         // Try to reconnect
         const reconnected = await this.attemptReconnection();
-        
+
         if (!reconnected) {
           return {
             isValid: false,
@@ -86,7 +86,7 @@ export class WalletSyncUtil {
       }
 
       const account = await this.getConnectedAccount();
-      
+
       if (!account || !account.address) {
         return {
           isValid: false,
@@ -96,10 +96,10 @@ export class WalletSyncUtil {
       }
 
       // Check wallet capabilities
-      const capabilities = oneChainWalletStandardService.getWalletCapabilities();
-      
+      const capabilities = MantleWalletStandardService.getWalletCapabilities();
+
       // Check if wallet supports at least one transaction method
-      const hasTransactionSupport = 
+      const hasTransactionSupport =
         capabilities['sui:signAndExecuteTransaction'] ||
         capabilities['sui:signTransaction'] ||
         capabilities['signAndExecuteTransactionBlock'] ||

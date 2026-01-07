@@ -2,20 +2,20 @@ import React from 'react';
 import { Box, Text, VStack, Badge, Button, useToast } from '@chakra-ui/react';
 import { useWalletStandard } from '@/hooks/useWalletStandard';
 import { useAppSelector } from '@/store';
-import { oneChainWalletStandardService } from '@/services/onechain-wallet-standard';
+import { MantleWalletStandardService } from '@/services/Mantle-wallet-standard';
 
 export const WalletDebug: React.FC = () => {
   const toast = useToast();
-  
+
   // Get wallet state from different sources
   const walletStandard = useWalletStandard();
   const reduxWallet = useAppSelector((state: any) => state.wallet);
-  
+
   const handleRefreshConnection = async () => {
     try {
-      const isConnected = await oneChainWalletStandardService.refreshConnectionState();
+      const isConnected = await MantleWalletStandardService.refreshConnectionState();
       const connectionState = await walletStandard.checkConnectionState();
-      
+
       toast({
         title: "Connection State Refreshed",
         description: `Service: ${isConnected}, Hook: ${connectionState}`,
@@ -36,7 +36,7 @@ export const WalletDebug: React.FC = () => {
 
   const handleTestTransaction = async () => {
     try {
-      if (!oneChainWalletStandardService.isConnected()) {
+      if (!MantleWalletStandardService.isConnected()) {
         throw new Error('Wallet not connected');
       }
 
@@ -49,14 +49,14 @@ export const WalletDebug: React.FC = () => {
       });
 
       // Create a simple test transaction
-      const tx = await oneChainWalletStandardService.createRWAInvestmentTransaction(
+      const tx = await MantleWalletStandardService.createRWAInvestmentTransaction(
         '0x7b8e0864967427679b4e129f79dc332a885c6087ec9e187b53451a9006ee15f2',
         '1000',
-        oneChainWalletStandardService.getConnectedAccount()?.address
+        MantleWalletStandardService.getConnectedAccount()?.address
       );
 
       // Execute the transaction
-      const result = await oneChainWalletStandardService.signAndExecuteTransaction(tx);
+      const result = await MantleWalletStandardService.signAndExecuteTransaction(tx);
 
       toast({
         title: "Transaction Successful!",
@@ -79,7 +79,7 @@ export const WalletDebug: React.FC = () => {
   return (
     <Box p={4} border="1px solid" borderColor="gray.200" borderRadius="md" bg="gray.50">
       <Text fontWeight="bold" mb={3}>Wallet Connection Debug</Text>
-      
+
       <VStack align="start" spacing={3}>
         <Box>
           <Text fontWeight="semibold">Wallet Standard Hook:</Text>
@@ -88,7 +88,7 @@ export const WalletDebug: React.FC = () => {
           <Text fontSize="sm">Loading: <Badge colorScheme={walletStandard.isLoading ? "yellow" : "gray"}>{walletStandard.isLoading ? "Yes" : "No"}</Badge></Text>
           <Text fontSize="sm">Error: {walletStandard.error || "None"}</Text>
         </Box>
-        
+
         <Box>
           <Text fontWeight="semibold">Redux Store:</Text>
           <Text fontSize="sm">Connected: <Badge colorScheme={reduxWallet.isConnected ? "green" : "red"}>{reduxWallet.isConnected ? "Yes" : "No"}</Badge></Text>
@@ -96,22 +96,22 @@ export const WalletDebug: React.FC = () => {
           <Text fontSize="sm">Connecting: <Badge colorScheme={reduxWallet.isConnecting ? "yellow" : "gray"}>{reduxWallet.isConnecting ? "Yes" : "No"}</Badge></Text>
           <Text fontSize="sm">Error: {reduxWallet.connectionError || "None"}</Text>
         </Box>
-        
+
         <Box>
           <Text fontWeight="semibold">Service Direct:</Text>
-          <Text fontSize="sm">Connected: <Badge colorScheme={oneChainWalletStandardService.isConnected() ? "green" : "red"}>{oneChainWalletStandardService.isConnected() ? "Yes" : "No"}</Badge></Text>
-          <Text fontSize="sm">Account: {oneChainWalletStandardService.getConnectedAccount()?.address || "None"}</Text>
-          <Text fontSize="sm">Wallet Available: <Badge colorScheme={oneChainWalletStandardService.isWalletExtensionAvailable() ? "green" : "red"}>{oneChainWalletStandardService.isWalletExtensionAvailable() ? "Yes" : "No"}</Badge></Text>
+          <Text fontSize="sm">Connected: <Badge colorScheme={MantleWalletStandardService.isConnected() ? "green" : "red"}>{MantleWalletStandardService.isConnected() ? "Yes" : "No"}</Badge></Text>
+          <Text fontSize="sm">Account: {MantleWalletStandardService.getConnectedAccount()?.address || "None"}</Text>
+          <Text fontSize="sm">Wallet Available: <Badge colorScheme={MantleWalletStandardService.isWalletExtensionAvailable() ? "green" : "red"}>{MantleWalletStandardService.isWalletExtensionAvailable() ? "Yes" : "No"}</Badge></Text>
         </Box>
-        
+
         <Box>
           <Text fontWeight="semibold">Wallet Capabilities:</Text>
           <Button size="xs" onClick={() => {
-            const capabilities = oneChainWalletStandardService.getWalletCapabilities();
+            const capabilities = MantleWalletStandardService.getWalletCapabilities();
             const capabilityList = Object.entries(capabilities)
               .map(([key, value]) => `${key}: ${value ? "✓" : "✗"}`)
               .join(", ");
-            
+
             toast({
               title: "Wallet Capabilities",
               description: capabilityList || "No wallet connected",
@@ -123,15 +123,15 @@ export const WalletDebug: React.FC = () => {
             Show Capabilities
           </Button>
         </Box>
-        
+
         <Button size="sm" onClick={handleRefreshConnection} colorScheme="blue">
           Refresh Connection State
         </Button>
-        
+
         <Button size="sm" onClick={handleTestTransaction} colorScheme="green">
           Test Transaction
         </Button>
-        
+
         <Button size="sm" onClick={async () => {
           try {
             const { WalletSyncUtil } = await import('@/utils/walletSync');
@@ -155,10 +155,10 @@ export const WalletDebug: React.FC = () => {
         }} colorScheme="green">
           Test Transaction Readiness
         </Button>
-        
+
         <Button size="sm" onClick={async () => {
           try {
-            const account = oneChainWalletStandardService.getConnectedAccount();
+            const account = MantleWalletStandardService.getConnectedAccount();
             if (!account) {
               toast({
                 title: "Test Transaction",
@@ -169,14 +169,14 @@ export const WalletDebug: React.FC = () => {
               });
               return;
             }
-            
+
             // Create a test transaction
-            const tx = await oneChainWalletStandardService.createRWAInvestmentTransaction(
+            const tx = await MantleWalletStandardService.createRWAInvestmentTransaction(
               "0x1234567890123456789012345678901234567890123456789012345678901234", // dummy address
               "1000", // 1000 units
               account.address
             );
-            
+
             toast({
               title: "Test Transaction Created",
               description: "Transaction created successfully. Check console for details.",
@@ -184,7 +184,7 @@ export const WalletDebug: React.FC = () => {
               duration: 3000,
               isClosable: true,
             });
-            
+
             console.log('Test transaction:', tx);
           } catch (error) {
             toast({

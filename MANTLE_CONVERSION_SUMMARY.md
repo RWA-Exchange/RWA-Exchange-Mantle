@@ -1,16 +1,16 @@
-# RWA Exchange: OneChain to Mantle Conversion Summary
+# RWA Exchange: Mantle to Mantle Conversion Summary
 
 ## 🔄 Conversion Overview
 
-Successfully converted the RWA Exchange from **OneChain (Sui-based)** to **Mantle Network (EVM-based)** with the following major changes:
+Successfully converted the RWA Exchange from **Mantle (Sui-based)** to **Mantle Network (EVM-based)** with the following major changes:
 
 ## 📋 Key Changes Made
 
 ### 1. **Blockchain Migration**
-- **From**: OneChain (Sui-based, Move language)
+- **From**: Mantle (Sui-based, Move language)
 - **To**: Mantle Network (EVM-compatible L2, Solidity)
 - **Chain ID**: 5003 (Mantle Sepolia Testnet)
-- **Native Token**: MNT instead of OCT
+- **Native Token**: MNT instead of MNT
 
 ### 2. **Smart Contract Conversion**
 - ✅ **Removed**: Move smart contracts (`sources/property_nft.move`)
@@ -26,7 +26,7 @@ Successfully converted the RWA Exchange from **OneChain (Sui-based)** to **Mantl
 - ✅ **Updated**: Ethers.js v5 → v6
 
 ### 4. **Wallet Integration**
-- ✅ **Removed**: OneChain wallet hooks
+- ✅ **Removed**: Mantle wallet hooks
 - ✅ **Added**: RainbowKit wallet connection
 - ✅ **Added**: Automatic Mantle network switching
 - ✅ **Updated**: Wallet guard components
@@ -170,9 +170,9 @@ npm run verify:mantle-testnet
 
 ### **Frontend**
 - ✅ Updated: `src/providers/DappKitProvider.tsx` → Web3Provider
-- ✅ Updated: `src/hooks/useOneChainWallet.ts` → useMantleWallet
+- ✅ Updated: `src/hooks/useMantleWallet.ts` → useMantleWallet
 - ✅ Updated: `src/services/propertyContract.ts`
-- ✅ Updated: `src/components/OneChainWalletConnect.tsx` → MantleWalletConnect
+- ✅ Updated: `src/components/MantleWalletConnect.tsx` → MantleWalletConnect
 - ✅ Updated: `src/components/WalletGuard.tsx`
 - ✅ Updated: `src/utils/secureLogger.ts`
 
@@ -189,7 +189,7 @@ npm run verify:mantle-testnet
 
 ## ✅ Conversion Status: COMPLETE
 
-The RWA Exchange has been successfully converted from OneChain to Mantle Network with all core functionality preserved and enhanced for the EVM ecosystem.
+The RWA Exchange has been successfully converted from Mantle to Mantle Network with all core functionality preserved and enhanced for the EVM ecosystem.
 
 ## 🔄 FINAL UPDATE: All 3 Smart Contracts Enhanced for Mantle
 

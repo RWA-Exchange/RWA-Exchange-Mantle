@@ -18,7 +18,7 @@ type Props = {
   tokenStandard?: string;
 };
 
-export function NftDetails({ nft, contractAddress, chainName = "OneChain", explorerBaseUrl = "", tokenStandard = "ERC721" }: Props) {
+export function NftDetails({ nft, contractAddress, chainName = "Mantle", explorerBaseUrl = "", tokenStandard = "ERC721" }: Props) {
   const contractUrl = useMemo(() => (explorerBaseUrl ? `${explorerBaseUrl}/address/${contractAddress}` : "#"), [explorerBaseUrl, contractAddress]);
   const tokenUrl = useMemo(() => (explorerBaseUrl ? `${explorerBaseUrl}/nft/${contractAddress}/${nft.id.toString()}` : "#"), [explorerBaseUrl, contractAddress, nft.id]);
   return (

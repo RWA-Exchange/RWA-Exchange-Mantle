@@ -4,22 +4,22 @@ import { Transaction } from '@mysten/sui/transactions';
 import { readFileSync, writeFileSync, existsSync } from 'fs';
 import { join } from 'path';
 
-// OneChain Testnet Configuration
-const ONECHAIN_TESTNET_RPC = 'https://testnet-rpc.onechain.one';
-const FAUCET_URL = 'https://faucet.testnet.onechain.one';
+// Mantle Testnet Configuration
+const Mantle_TESTNET_RPC = 'https://testnet-rpc.Mantle.one';
+const FAUCET_URL = 'https://faucet.testnet.Mantle.one';
 
-async function deployToOneChain() {
-  console.log('🚀 Deploying RWA Exchange to OneChain Testnet...');
-  
+async function deployToMantle() {
+  console.log('🚀 Deploying RWA Exchange to Mantle Testnet...');
+
   try {
-    // Initialize OneChain client
-    const client = new SuiClient({ url: ONECHAIN_TESTNET_RPC });
-    console.log(`📡 Connected to OneChain Testnet: ${ONECHAIN_TESTNET_RPC}`);
+    // Initialize Mantle client
+    const client = new SuiClient({ url: Mantle_TESTNET_RPC });
+    console.log(`📡 Connected to Mantle Testnet: ${Mantle_TESTNET_RPC}`);
 
     // Generate or load keypair
     let keypair: Ed25519Keypair;
-    const keypairPath = join(process.cwd(), '.onechain-keypair');
-    
+    const keypairPath = join(process.cwd(), '.Mantle-keypair');
+
     if (existsSync(keypairPath)) {
       console.log('🔑 Loading existing keypair...');
       const keypairData = readFileSync(keypairPath, 'utf8');
@@ -30,7 +30,7 @@ async function deployToOneChain() {
       keypair = new Ed25519Keypair();
       const secretKey = keypair.getSecretKey();
       writeFileSync(keypairPath, Buffer.from(secretKey).toString('hex'));
-      console.log('💾 Keypair saved to .onechain-keypair');
+      console.log('💾 Keypair saved to .Mantle-keypair');
     }
 
     const address = keypair.getPublicKey().toSuiAddress();
@@ -43,7 +43,7 @@ async function deployToOneChain() {
 
       if (parseInt(balance.totalBalance) < 1e8) { // Less than 0.1 ONE
         console.log('⚠️  Low balance detected. Please fund your wallet:');
-        console.log(`   OneChain Testnet Faucet: ${FAUCET_URL}`);
+        console.log(`   Mantle Testnet Faucet: ${FAUCET_URL}`);
         console.log(`   Your address: ${address}`);
         console.log('   Please fund your wallet and run the script again.');
         return;
@@ -55,7 +55,7 @@ async function deployToOneChain() {
     // For now, let's create a simple transaction to test the connection
     // and then use placeholder addresses that we'll update later
     console.log('🔨 Creating test transaction...');
-    
+
     const tx = new Transaction();
     tx.setGasBudget(10_000_000); // 0.01 ONE
 
@@ -75,8 +75,8 @@ async function deployToOneChain() {
       // For now, we'll use the EchoVillage contract as a reference
       // and create placeholder deployment info
       const deploymentInfo = {
-        network: 'onechain-testnet',
-        rpcUrl: ONECHAIN_TESTNET_RPC,
+        network: 'Mantle-testnet',
+        rpcUrl: Mantle_TESTNET_RPC,
         deployerAddress: address,
         timestamp: new Date().toISOString(),
         contracts: {
@@ -87,19 +87,19 @@ async function deployToOneChain() {
         testTransactionDigest: result.digest,
       };
 
-      const deploymentPath = join(process.cwd(), 'onechain-deployment.json');
+      const deploymentPath = join(process.cwd(), 'Mantle-deployment.json');
       writeFileSync(deploymentPath, JSON.stringify(deploymentInfo, null, 2));
-      console.log('💾 Deployment info saved to onechain-deployment.json');
+      console.log('💾 Deployment info saved to Mantle-deployment.json');
 
       // Update the frontend configuration
       await updateFrontendConfig(deploymentInfo.contracts);
 
-      console.log('\n🎉 OneChain connection established successfully!');
+      console.log('\n🎉 Mantle connection established successfully!');
       console.log('📝 Next steps:');
-      console.log('1. Deploy actual Move contracts using OneChain CLI');
+      console.log('1. Deploy actual Move contracts using Mantle CLI');
       console.log('2. Update the contract addresses in the deployment file');
       console.log('3. Test the marketplace functionality');
-      
+
     } catch (error) {
       console.error('❌ Transaction failed:', error);
     }
@@ -112,26 +112,26 @@ async function deployToOneChain() {
 
 async function updateFrontendConfig(contracts: any) {
   console.log('🔄 Updating frontend configuration...');
-  
+
   try {
     // Update NFT contracts configuration
     const nftContractsPath = join(process.cwd(), 'src', 'consts', 'nft_contracts.ts');
-    
+
     if (existsSync(nftContractsPath)) {
       let content = readFileSync(nftContractsPath, 'utf8');
-      
+
       // Replace the first placeholder address with PropertyNFT address
       content = content.replace(
         /address: "0x0000000000000000000000000000000000000000"/,
         `address: "${contracts.PropertyNFT}"`
       );
-      
+
       // Replace the second placeholder address with Fractionalizer address
       content = content.replace(
         /address: "0x0000000000000000000000000000000000000000"/,
         `address: "${contracts.Fractionalizer}"`
       );
-      
+
       writeFileSync(nftContractsPath, content);
       console.log('✅ Updated NFT contracts configuration');
     }
@@ -139,17 +139,17 @@ async function updateFrontendConfig(contracts: any) {
     // Create or update environment variables
     const envPath = join(process.cwd(), '.env.local');
     let envContent = '';
-    
+
     if (existsSync(envPath)) {
       envContent = readFileSync(envPath, 'utf8');
     }
-    
-    // Add OneChain configuration
+
+    // Add Mantle configuration
     const envVars = [
-      `NEXT_PUBLIC_ONECHAIN_RPC_URL=${ONECHAIN_TESTNET_RPC}`,
+      `NEXT_PUBLIC_Mantle_RPC_URL=${Mantle_TESTNET_RPC}`,
       `NEXT_PUBLIC_PROPERTY_NFT_ADDRESS=${contracts.PropertyNFT}`,
       `NEXT_PUBLIC_FRACTIONALIZER_ADDRESS=${contracts.Fractionalizer}`,
-      `NEXT_PUBLIC_NETWORK=onechain-testnet`,
+      `NEXT_PUBLIC_NETWORK=Mantle-testnet`,
     ];
 
     envVars.forEach(envVar => {
@@ -160,10 +160,10 @@ async function updateFrontendConfig(contracts: any) {
         envContent += `\n${envVar}`;
       }
     });
-    
+
     writeFileSync(envPath, envContent);
     console.log('✅ Updated environment variables');
-    
+
   } catch (error) {
     console.warn('⚠️  Could not update frontend configuration:', error);
   }
@@ -171,7 +171,7 @@ async function updateFrontendConfig(contracts: any) {
 
 // Run deployment
 if (require.main === module) {
-  deployToOneChain().catch(console.error);
+  deployToMantle().catch(console.error);
 }
 
-export { deployToOneChain };
+export { deployToMantle };

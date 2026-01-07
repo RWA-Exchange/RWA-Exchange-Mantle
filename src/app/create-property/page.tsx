@@ -82,7 +82,7 @@ export default function CreatePropertyPage() {
                 fontFamily="Inter"
                 lineHeight="1.6"
               >
-                Tokenize your real estate asset and enable fractional ownership on OneChain
+                Tokenize your real estate asset and enable fractional ownership on Mantle
               </Text>
             </Box>
 

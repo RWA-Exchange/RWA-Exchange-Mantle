@@ -23,12 +23,12 @@ import {
 } from "@chakra-ui/react";
 import { keyframes } from "@emotion/react";
 import { Link } from "@chakra-ui/next-js";
-import { 
-  FaHome, 
-  FaCoins, 
-  FaShieldAlt, 
-  FaGlobe, 
-  FaChartLine, 
+import {
+  FaHome,
+  FaCoins,
+  FaShieldAlt,
+  FaGlobe,
+  FaChartLine,
   FaUsers,
   FaLock,
   FaRocket,
@@ -97,29 +97,29 @@ export default function LandingPage() {
             <Badge colorScheme="purple" variant="solid" px={4} py={2} rounded="full">
               Revolutionary RWA Platform
             </Badge>
-            
-            <Heading 
-              size={{ base: "2xl", md: "4xl" }} 
+
+            <Heading
+              size={{ base: "2xl", md: "4xl" }}
               lineHeight={1.1}
               fontWeight="bold"
               maxW="4xl"
             >
               Democratize Real-World Asset Investment
             </Heading>
-            
-            <Text 
-              fontSize={{ base: "lg", md: "xl" }} 
+
+            <Text
+              fontSize={{ base: "lg", md: "xl" }}
               maxW="3xl"
               opacity={0.9}
             >
-              OneRWA enables fractional ownership of premium real estate, art, commodities, 
+              MantleRWA enables fractional ownership of premium real estate, art, commodities,
               and more through blockchain technology. Invest in the real world, powered by DeFi.
             </Text>
-            
+
             <HStack spacing={4} pt={4}>
-              <Button 
-                as={Link} 
-                href="/" 
+              <Button
+                as={Link}
+                href="/"
                 size="lg"
                 colorScheme="white"
                 variant="solid"
@@ -129,9 +129,9 @@ export default function LandingPage() {
               >
                 Explore Marketplace
               </Button>
-              <Button 
-                as={Link} 
-                href="/dashboard" 
+              <Button
+                as={Link}
+                href="/dashboard"
                 size="lg"
                 variant="outline"
                 borderColor="white"
@@ -174,13 +174,13 @@ export default function LandingPage() {
       <Box py={20}>
         <Container maxW="6xl">
           <VStack spacing={4} textAlign="center" mb={16}>
-            <Heading size="xl">Why Choose OneRWA?</Heading>
+            <Heading size="xl">Why Choose MantleRWA?</Heading>
             <Text fontSize="lg" color={textColor} maxW="2xl">
-              Our platform combines cutting-edge blockchain technology with traditional asset management 
+              Our platform combines cutting-edge blockchain technology with traditional asset management
               to create unprecedented investment opportunities.
             </Text>
           </VStack>
-          
+
           <SimpleGrid columns={{ base: 1, md: 2, lg: 3 }} spacing={8}>
             {[
               {
@@ -284,7 +284,7 @@ export default function LandingPage() {
       {/* Adoption Examples */}
       <Section
         title="Real-world adoption examples"
-        subtitle="Industries already exploring tokenization with OneRWA."
+        subtitle="Industries already exploring tokenization with MantleRWA."
       >
         <SimpleGrid columns={{ base: 1, md: 3 }} spacing={6}>
           <ExampleCard title="Real Estate" desc="Fractional property ownership and rental streams." />
@@ -294,8 +294,8 @@ export default function LandingPage() {
       </Section>
 
       {/* Enhanced CTA Section */}
-      <Box 
-        py={24} 
+      <Box
+        py={24}
         bg={useColorModeValue(
           "linear-gradient(135deg, purple.500 0%, blue.600 100%)",
           "linear-gradient(135deg, purple.600 0%, blue.700 100%)"
@@ -325,32 +325,32 @@ export default function LandingPage() {
           bg="whiteAlpha.150"
           animation={`${float} 6s ease-in-out infinite reverse`}
         />
-        
+
         <Container maxW="6xl" position="relative" zIndex={1}>
           <VStack spacing={8} textAlign="center">
-            <Heading 
-              size="2xl" 
+            <Heading
+              size="2xl"
               fontFamily="Outfit"
               fontWeight="800"
               maxW="4xl"
             >
               Ready to Revolutionize Your Investment Portfolio?
             </Heading>
-            
-            <Text 
-              fontSize="xl" 
+
+            <Text
+              fontSize="xl"
               maxW="3xl"
               opacity={0.9}
               lineHeight="1.8"
             >
-              Join thousands of investors who are already building wealth through 
+              Join thousands of investors who are already building wealth through
               tokenized real-world assets. Start your journey today.
             </Text>
-            
+
             <HStack spacing={6} pt={4} flexWrap="wrap" justify="center">
-              <Button 
-                as={Link} 
-                href="/" 
+              <Button
+                as={Link}
+                href="/"
                 size="xl"
                 bg="white"
                 color="purple.600"
@@ -359,7 +359,7 @@ export default function LandingPage() {
                 px={12}
                 py={8}
                 fontSize="lg"
-                _hover={{ 
+                _hover={{
                   transform: "translateY(-3px) scale(1.05)",
                   boxShadow: "2xl",
                   bg: "purple.50"
@@ -368,9 +368,9 @@ export default function LandingPage() {
               >
                 Launch Marketplace
               </Button>
-              <Button 
-                as={Link} 
-                href="/dashboard" 
+              <Button
+                as={Link}
+                href="/dashboard"
                 size="xl"
                 variant="outline"
                 borderColor="white"
@@ -381,7 +381,7 @@ export default function LandingPage() {
                 px={12}
                 py={8}
                 fontSize="lg"
-                _hover={{ 
+                _hover={{
                   bg: "whiteAlpha.200",
                   transform: "translateY(-3px)",
                   borderColor: "purple.200"
@@ -398,19 +398,19 @@ export default function LandingPage() {
   );
 }
 
-function EnhancedFeatureCard({ 
-  icon, 
-  title, 
-  desc, 
-  color 
-}: { 
-  icon: any; 
-  title: string; 
-  desc: string; 
+function EnhancedFeatureCard({
+  icon,
+  title,
+  desc,
+  color
+}: {
+  icon: any;
+  title: string;
+  desc: string;
   color: string;
 }) {
   const cardBg = useColorModeValue("white", "gray.800");
-  
+
   return (
     <Box
       bg={cardBg}
@@ -419,8 +419,8 @@ function EnhancedFeatureCard({
       rounded="xl"
       shadow="lg"
       transition="all 0.3s ease"
-      _hover={{ 
-        transform: "translateY(-8px)", 
+      _hover={{
+        transform: "translateY(-8px)",
         shadow: "2xl",
         borderColor: `${color}.200`
       }}
@@ -435,12 +435,12 @@ function EnhancedFeatureCard({
         h="2px"
         bg={`${color}.400`}
       />
-      
+
       <VStack align="start" spacing={4}>
-        <Icon 
-          as={icon} 
-          w={12} 
-          h={12} 
+        <Icon
+          as={icon}
+          w={12}
+          h={12}
           color={`${color}.500`}
           p={2}
           bg={`${color}.50`}

@@ -1,4 +1,4 @@
-// OneChain RWA contract configuration
+// Mantle RWA contract configuration
 
 /**
  * Contract addresses for RWA (Real World Assets) contracts
@@ -11,7 +11,7 @@ export type RWAContractAddresses = {
 };
 
 /**
- * RWA contract addresses for OneChain network
+ * RWA contract addresses for Mantle network
  */
 export const RWA_CONTRACT_ADDRESSES: RWAContractAddresses = {
   PropertyNFT: "0x0000000000000000000000000000000000000000", // Replace with actual deployed address

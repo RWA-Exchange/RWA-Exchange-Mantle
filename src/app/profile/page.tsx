@@ -2,25 +2,20 @@
 
 import { ProfileSection } from "@/components/profile-page/Profile";
 import { Box, Flex, Heading } from "@chakra-ui/react";
-import { useEffect } from "react";
-import { useDappKit } from "@/hooks/useDappKit";
+import { useAccount } from "wagmi";
+import { ConnectButton } from "@rainbow-me/rainbowkit";
 
 export default function ProfilePage() {
-  const { account, connect, isConnected } = useDappKit();
-  
-  useEffect(() => {
-    if (!isConnected) {
-      connect();
-    }
-  }, [isConnected, connect]);
-  
-  if (!account)
+  const { address, isConnected } = useAccount();
+
+  if (!isConnected || !address)
     return (
       <Box>
-        <Flex>
-          <Heading m="auto">Connect OneChain Wallet to continue</Heading>
+        <Flex direction="column" align="center" justify="center" h="50vh">
+          <Heading mb={6}>Connect Wallet to continue</Heading>
+          <ConnectButton />
         </Flex>
       </Box>
     );
-  return <ProfileSection address={account.address} />;
+  return <ProfileSection address={address} />;
 }

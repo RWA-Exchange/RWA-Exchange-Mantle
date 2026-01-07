@@ -5,23 +5,23 @@ export type Token = {
 };
 
 /**
- * Supported tokens for OneChain network
+ * Supported tokens for Mantle network
  * These are the ERC20 tokens that can be used for payments in the marketplace
  */
 export const SUPPORTED_TOKENS: Token[] = [
   {
-    tokenAddress: "0x2::oct::OCT", // OneChain OCT token address
-    symbol: "OCT",
-    icon: "/erc20-icons/oct.png",
+    tokenAddress: "0x2::MNT::MNT", // Mantle MNT token address
+    symbol: "MNT",
+    icon: "/erc20-icons/MNT.png",
   },
   {
-    tokenAddress: "0x0000000000000000000000000000000000000000", // Replace with actual USDC on OneChain
+    tokenAddress: "0x0000000000000000000000000000000000000000", // Replace with actual USDC on Mantle
     symbol: "USDC",
     icon: "/erc20-icons/usdc.png",
   },
   {
-    tokenAddress: "0x0000000000000000000000000000000000000000", // Replace with actual USDT on OneChain
-    symbol: "USDT", 
+    tokenAddress: "0x0000000000000000000000000000000000000000", // Replace with actual USDT on Mantle
+    symbol: "USDT",
     icon: "/erc20-icons/usdt.png",
   },
   {

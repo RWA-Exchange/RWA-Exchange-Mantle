@@ -1,12 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-const ONECHAIN_RPC_URL = 'https://rpc-testnet.onelabs.cc';
+const Mantle_RPC_URL = 'https://rpc-testnet.onelabs.cc';
 
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    
-    const response = await fetch(ONECHAIN_RPC_URL, {
+
+    const response = await fetch(Mantle_RPC_URL, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -19,7 +19,7 @@ export async function POST(request: NextRequest) {
     }
 
     const data = await response.json();
-    
+
     return NextResponse.json(data, {
       headers: {
         'Access-Control-Allow-Origin': '*',
@@ -28,9 +28,9 @@ export async function POST(request: NextRequest) {
       },
     });
   } catch (error) {
-    console.error('OneChain proxy error:', error);
+    console.error('Mantle proxy error:', error);
     return NextResponse.json(
-      { error: 'Failed to proxy request to OneChain' },
+      { error: 'Failed to proxy request to Mantle' },
       { status: 500 }
     );
   }

@@ -6,13 +6,13 @@ const { readFileSync, writeFileSync, existsSync, readdirSync } = require('fs');
 const { join } = require('path');
 const { execSync } = require('child_process');
 
-// Configuration for OneChain
+// Configuration for Mantle
 const NETWORK = 'testnet';
 const RPC_URL = 'https://fullnode.testnet.sui.io:443';
 
 async function deployContract() {
   console.log('🚀 Starting RWA Exchange Move contract deployment...');
-  
+
   try {
     // Initialize Sui client
     const client = new SuiClient({ url: RPC_URL });
@@ -21,11 +21,11 @@ async function deployContract() {
     // Load or create keypair
     let keypair;
     const keypairPath = join(process.cwd(), '.sui-keypair');
-    
+
     if (existsSync(keypairPath)) {
       console.log('🔑 Loading existing keypair...');
       const keypairData = readFileSync(keypairPath, 'utf8').trim();
-      
+
       try {
         // Try parsing as JSON first
         const keypairJson = JSON.parse(keypairData);
@@ -55,7 +55,7 @@ async function deployContract() {
       console.log('⚠️  Low balance detected. You may need to fund your wallet.');
       console.log(`   Get testnet SUI from: https://faucet.testnet.sui.io/`);
       console.log(`   Your address: ${address}`);
-      
+
       // Try to request from faucet
       console.log('🚰 Attempting to request funds from faucet...');
       try {
@@ -70,11 +70,11 @@ async function deployContract() {
             },
           }),
         });
-        
+
         if (faucetResponse.ok) {
           console.log('✅ Faucet request successful! Waiting for funds...');
           await new Promise(resolve => setTimeout(resolve, 5000)); // Wait 5 seconds
-          
+
           // Check balance again
           const newBalance = await client.getBalance({ owner: address });
           console.log(`💰 New Balance: ${newBalance.totalBalance} MIST (${parseInt(newBalance.totalBalance) / 1e9} SUI)`);
@@ -93,9 +93,9 @@ async function deployContract() {
     // Build the Move package
     try {
       console.log('🔨 Building Move package...');
-      execSync('sui move build', { 
-        cwd: movePackagePath, 
-        stdio: 'inherit' 
+      execSync('sui move build', {
+        cwd: movePackagePath,
+        stdio: 'inherit'
       });
     } catch (buildError) {
       console.error('❌ Failed to build Move package:', buildError);
@@ -105,7 +105,7 @@ async function deployContract() {
     // Read the compiled bytecode
     const buildDir = join(movePackagePath, 'build', 'rwa_exchange');
     const bytecodeModulesPath = join(buildDir, 'bytecode_modules');
-    
+
     if (!existsSync(bytecodeModulesPath)) {
       console.error('❌ Bytecode modules not found. Make sure the Move package built successfully.');
       return;
@@ -157,7 +157,7 @@ async function deployContract() {
 
     if (packageId) {
       console.log(`📦 Package ID: ${packageId}`);
-      
+
       // Save deployment info
       const deploymentInfo = {
         network: NETWORK,
@@ -178,10 +178,10 @@ async function deployContract() {
 
       console.log('\n🎉 Deployment completed successfully!');
       console.log(`🔗 View on Sui Explorer: https://suiexplorer.com/object/${packageId}?network=${NETWORK}`);
-      
+
       // Create some sample properties
       await createSampleProperties(client, keypair, packageId);
-      
+
     } else {
       console.error('❌ Could not extract package ID from deployment result');
     }
@@ -194,26 +194,26 @@ async function deployContract() {
 
 async function updateContractConstants(packageId) {
   console.log('🔄 Updating contract constants in frontend...');
-  
+
   try {
     // Update the NFT contracts configuration
     const nftContractsPath = join(process.cwd(), 'src', 'consts', 'nft_contracts.ts');
-    
+
     if (existsSync(nftContractsPath)) {
       let content = readFileSync(nftContractsPath, 'utf8');
-      
+
       // Replace the placeholder package ID
       content = content.replace(
         /packageId:\s*['"][^'"]*['"]/g,
         `packageId: '${packageId}'`
       );
-      
+
       // Update the address field as well
       content = content.replace(
         /address:\s*['"][^'"]*['"]/g,
         `address: '${packageId}'`
       );
-      
+
       writeFileSync(nftContractsPath, content);
       console.log('✅ Updated NFT contracts configuration');
     }
@@ -221,11 +221,11 @@ async function updateContractConstants(packageId) {
     // Create or update environment variables
     const envPath = join(process.cwd(), '.env.local');
     let envContent = '';
-    
+
     if (existsSync(envPath)) {
       envContent = readFileSync(envPath, 'utf8');
     }
-    
+
     // Update or add the package ID
     if (envContent.includes('NEXT_PUBLIC_RWA_PACKAGE_ID')) {
       envContent = envContent.replace(
@@ -235,10 +235,10 @@ async function updateContractConstants(packageId) {
     } else {
       envContent += `\nNEXT_PUBLIC_RWA_PACKAGE_ID=${packageId}\n`;
     }
-    
+
     writeFileSync(envPath, envContent);
     console.log('✅ Updated environment variables');
-    
+
   } catch (error) {
     console.warn('⚠️  Could not update contract constants:', error);
   }
@@ -246,7 +246,7 @@ async function updateContractConstants(packageId) {
 
 async function createSampleProperties(client, keypair, packageId) {
   console.log('🏠 Creating sample properties...');
-  
+
   const properties = [
     {
       name: 'Luxury Downtown Condo',
@@ -285,12 +285,12 @@ async function createSampleProperties(client, keypair, packageId) {
 
   for (let i = 0; i < properties.length; i++) {
     const property = properties[i];
-    
+
     try {
       console.log(`🏗️  Creating property ${i + 1}: ${property.name}`);
-      
+
       const tx = new Transaction();
-      
+
       tx.moveCall({
         target: `${packageId}::property_nft::create_property`,
         arguments: [
@@ -319,15 +319,15 @@ async function createSampleProperties(client, keypair, packageId) {
       });
 
       console.log(`✅ Property ${i + 1} created! TX: ${result.digest}`);
-      
+
       // Wait a bit between transactions
       await new Promise(resolve => setTimeout(resolve, 1000));
-      
+
     } catch (error) {
       console.error(`❌ Failed to create property ${i + 1}:`, error);
     }
   }
-  
+
   console.log('🎉 Sample properties creation completed!');
 }
 

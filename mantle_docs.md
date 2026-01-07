@@ -1389,7 +1389,7 @@ Returns an array of all logs matching a given filter object.
 
 The API credit value for this method is 20.
 Updated on
-Oct 07, 2025
+MNT 07, 2025
 Please be aware that the block range limit for this RPC method is 5 blocks for users on the Free Trial plan and 10,000 blocks for those on paid plans. Consider dividing your queries into smaller segments to enhance response times and manage errors more effectively. For further details on the block range limit and strategies for mitigating it, please consult the FAQ
 Parameters
 object
@@ -2009,7 +2009,7 @@ Creates a filter object, based on filter options, to notify when the state chang
 
 The API credit value for this method is 20.
 Updated on
-Oct 07, 2025
+MNT 07, 2025
 Please be aware that the block range limit for this RPC method is 5 blocks for users on the Free Trial plan and 10,000 blocks for those on paid plans. Consider dividing your queries into smaller segments to enhance response times and manage errors more effectively. For further details on the block range limit and strategies for mitigating it, please consult the FAQ
 Parameters
 object

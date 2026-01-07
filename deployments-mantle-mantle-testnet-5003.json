@@ -1,0 +1,42 @@
+{
+  "network": "mantle-testnet",
+  "chainId": 5003,
+  "deployer": "0x8bB9b052ad7ec275b46bfcDe425309557EFFAb07",
+  "timestamp": "2026-01-06T14:10:40.115Z",
+  "contracts": {
+    "PropertyNFT": "0x7Cd6674681f4b83E971Feb058323b8088f48AA77",
+    "Fractionalizer": "0x8722af25ffD466Bc3E7038A54ED83BAe811DD536"
+  },
+  "features": {
+    "PropertyNFT": [
+      "Enhanced fractional ownership",
+      "MNT token integration",
+      "Platform fee system",
+      "Dividend distribution",
+      "Investment tracking",
+      "Portfolio analytics",
+      "Emergency controls"
+    ],
+    "Fractionalizer": [
+      "Advanced fractionalization",
+      "MNT-based pricing",
+      "Fraction purchasing",
+      "Enhanced metadata",
+      "Platform fee integration",
+      "KYC placeholder system"
+    ],
+    "Fraction": [
+      "ERC20 with governance (ERC20Votes)",
+      "Permit functionality (gasless approvals)",
+      "Enhanced metadata tracking",
+      "Account freezing capability",
+      "Property value calculations",
+      "Percentage ownership tracking"
+    ]
+  },
+  "gasUsed": {
+    "PropertyNFT": "Estimated ~3.2M gas",
+    "Fractionalizer": "Estimated ~2.8M gas",
+    "FractionToken": "Deployed dynamically (~2.1M gas each)"
+  }
+}

@@ -1,19 +1,19 @@
 "use client";
 
-import { 
-  Container, 
-  Heading, 
-  Text, 
-  Box, 
-  SimpleGrid, 
-  VStack, 
-  HStack, 
-  Badge, 
-  Button, 
-  Image, 
-  Stat, 
-  StatLabel, 
-  StatNumber, 
+import {
+  Container,
+  Heading,
+  Text,
+  Box,
+  SimpleGrid,
+  VStack,
+  HStack,
+  Badge,
+  Button,
+  Image,
+  Stat,
+  StatLabel,
+  StatNumber,
   StatHelpText,
   Card,
   CardBody,
@@ -26,10 +26,11 @@ import {
   useColorModeValue,
   useToast
 } from "@chakra-ui/react";
-import { FaShoppingCart, FaEye, FaChartLine, FaCoins, FaUsers } from "react-icons/fa";
+import { FaShoppingCart, FaEye, FaCoins } from "react-icons/fa";
 import { useMarketplaceContext } from "@/hooks/useMarketplaceContext";
-import { useWalletStandard } from "@/hooks/useWalletStandard";
+import { useAccount } from "wagmi";
 import { useState } from "react";
+import { ConnectButton } from "@rainbow-me/rainbowkit";
 
 export function Collection() {
   const {
@@ -45,12 +46,12 @@ export function Collection() {
     investInAsset,
     refresh
   } = useMarketplaceContext();
-  
-  const { isConnected, connect } = useWalletStandard();
+
+  const { isConnected } = useAccount();
   const toast = useToast();
-  
+
   const [buyingAssetId, setBuyingAssetId] = useState<string | null>(null);
-  
+
   const cardBg = useColorModeValue("white", "gray.800");
   const textColor = useColorModeValue("gray.600", "gray.300");
   const borderColor = useColorModeValue("gray.200", "gray.600");
@@ -182,7 +183,7 @@ export function Collection() {
         <Text fontSize="lg" color={textColor} maxW="3xl">
           {contract.description}
         </Text>
-        
+
         {/* Collection Stats */}
         <SimpleGrid columns={{ base: 1, md: 3 }} spacing={8} w="full" maxW="2xl">
           <Stat textAlign="center" bg={cardBg} p={4} rounded="lg" border="1px solid" borderColor={borderColor}>
@@ -234,39 +235,39 @@ export function Collection() {
             {assets.map((asset) => {
               const listing = listings.find(l => l.assetId === asset.id && l.isActive);
               const isBuying = buyingAssetId === asset.id;
-              
+
               return (
                 <Card key={asset.id} bg={cardBg} rounded="xl" overflow="hidden" shadow="lg" border="1px solid" borderColor={borderColor}>
                   <Box position="relative">
-                    <Image 
-                      src={asset.imageUrl} 
+                    <Image
+                      src={asset.imageUrl}
                       alt={asset.title}
                       w="full"
                       h="240px"
                       objectFit="cover"
                       fallbackSrc="https://via.placeholder.com/400x240?text=Asset+Image"
                     />
-                    <Badge 
-                      position="absolute" 
-                      top={4} 
-                      right={4} 
+                    <Badge
+                      position="absolute"
+                      top={4}
+                      right={4}
                       colorScheme={asset.isListed ? "green" : "gray"}
                       variant="solid"
                     >
                       {asset.isListed ? "Listed" : "Unlisted"}
                     </Badge>
                   </Box>
-                  
+
                   <CardBody p={6}>
                     <VStack align="start" spacing={4}>
                       <Heading size="md" noOfLines={2}>
                         {asset.title}
                       </Heading>
-                      
+
                       <Text color={textColor} fontSize="sm" noOfLines={3}>
                         {asset.description}
                       </Text>
-                      
+
                       {/* Asset Metadata */}
                       <VStack align="start" spacing={2} w="full">
                         {asset.metadata.location && (
@@ -288,9 +289,9 @@ export function Collection() {
                           </HStack>
                         )}
                       </VStack>
-                      
+
                       <Divider />
-                      
+
                       {/* Pricing and Actions */}
                       {listing ? (
                         <VStack spacing={3} w="full">
@@ -298,19 +299,19 @@ export function Collection() {
                             <VStack align="start" spacing={1}>
                               <Text fontSize="xs" color="gray.500">Price</Text>
                               <Text fontSize="lg" fontWeight="700" color="purple.500">
-                                ${(parseInt(listing.price) / 100).toLocaleString()}
+                                {(parseInt(listing.price) / 1e18).toLocaleString()} MNT
                               </Text>
                             </VStack>
                             {listing.fractionalShares && (
                               <VStack align="end" spacing={1}>
                                 <Text fontSize="xs" color="gray.500">Per Share</Text>
                                 <Text fontSize="lg" fontWeight="700" color="green.500">
-                                  ${(parseInt(listing.fractionalShares.pricePerShare) / 100).toLocaleString()}
+                                  {(parseInt(listing.fractionalShares.pricePerShare) / 1e18).toLocaleString()} MNT
                                 </Text>
                               </VStack>
                             )}
                           </HStack>
-                          
+
                           {listing.fractionalShares && (
                             <HStack justify="space-between" w="full" fontSize="sm">
                               <Text color={textColor}>
@@ -318,7 +319,7 @@ export function Collection() {
                               </Text>
                             </HStack>
                           )}
-                          
+
                           <HStack spacing={2} w="full">
                             <Button
                               as="a"
@@ -339,7 +340,7 @@ export function Collection() {
                                 leftIcon={<FaCoins />}
                                 isLoading={isBuying}
                                 loadingText="Investing..."
-                                onClick={() => handleInvestInAsset(asset.id, listing.fractionalShares!.pricePerShare)}
+                                onClick={() => handleInvestInAsset(asset.id, "1")} // default to 1 share for quick buy
                               >
                                 Invest
                               </Button>
@@ -379,11 +380,11 @@ export function Collection() {
           <VStack spacing={4}>
             <Heading size="lg">Connect Your Wallet</Heading>
             <Text color={textColor}>
-              Connect your OneChain wallet to start investing in tokenized real-world assets.
+              Connect your wallet to start investing in tokenized real-world assets on Mantle.
             </Text>
-            <Button colorScheme="purple" size="lg" onClick={connect}>
-              Connect Wallet
-            </Button>
+            <Box>
+              <ConnectButton />
+            </Box>
           </VStack>
         </Box>
       )}

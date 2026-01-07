@@ -23,6 +23,17 @@ class SecureLogger {
   }
 
   /**
+   * Check if logging is enabled for the given level
+   */
+  private shouldLog(level: LogLevel): boolean {
+    const levels = ['debug', 'info', 'warn', 'error'];
+    const currentLevelIndex = levels.indexOf(this.config.level);
+    const requestedLevelIndex = levels.indexOf(level);
+
+    return requestedLevelIndex >= currentLevelIndex;
+  }
+
+  /**
    * Sanitize sensitive data from objects and strings
    */
   private sanitize(data: any): any {
@@ -47,12 +58,12 @@ class SecureLogger {
 
     if (typeof data === 'object' && data !== null) {
       const sanitized: any = Array.isArray(data) ? [] : {};
-      
+
       for (const key in data) {
-        if (key.toLowerCase().includes('private') || 
-            key.toLowerCase().includes('secret') ||
-            key.toLowerCase().includes('password') ||
-            key.toLowerCase().includes('mnemonic')) {
+        if (key.toLowerCase().includes('private') ||
+          key.toLowerCase().includes('secret') ||
+          key.toLowerCase().includes('password') ||
+          key.toLowerCase().includes('mnemonic')) {
           sanitized[key] = '[REDACTED]';
         } else if (key === 'hash' || key === 'transactionHash' || key === 'address') {
           sanitized[key] = '[REDACTED]';
@@ -60,7 +71,7 @@ class SecureLogger {
           sanitized[key] = this.sanitize(data[key]);
         }
       }
-      
+
       return sanitized;
     }
 
@@ -68,17 +79,10 @@ class SecureLogger {
   }
 
   private log(level: LogLevel, message: string, data?: any) {
-    if (!this.config.enableConsole) return;
+    if (!this.config.enableConsole || !this.shouldLog(level)) return;
 
     const sanitizedData = data ? this.sanitize(data) : undefined;
     const timestamp = new Date().toISOString();
-    
-    const logEntry = {
-      timestamp,
-      level: level.toUpperCase(),
-      message,
-      ...(sanitizedData && { data: sanitizedData })
-    };
 
     switch (level) {
       case 'debug':
@@ -112,7 +116,7 @@ class SecureLogger {
     this.log('error', message, data);
   }
 
-  // Specialized logging methods for different components
+  // Specialized logging methods
   property(message: string, data?: any) {
     this.log('info', `[PROPERTY] ${message}`, data);
   }
@@ -128,105 +132,16 @@ class SecureLogger {
   contract(message: string, data?: any) {
     this.log('info', `[CONTRACT] ${message}`, data);
   }
-}
 
-export const logger = new SecureLogger();
+  blockchain(message: string, data?: any) {
+    this.log('info', `[BLOCKCHAIN] ${message}`, data);
   }
 
-  /**
-   * Check if logging is enabled for the given level
-   */
-  private shouldLog(level: LogLevel): boolean {
-    const levels = ['debug', 'info', 'warn', 'error'];
-    const currentLevelIndex = levels.indexOf(this.config.level);
-    const requestedLevelIndex = levels.indexOf(level);
-    
-    return requestedLevelIndex >= currentLevelIndex;
-  }
-
-  /**
-   * Log debug information (development only)
-   */
-  debug(message: string, data?: any) {
-    if (!this.shouldLog('debug') || !this.config.enableConsole) return;
-    
-    const sanitizedData = data ? this.sanitize(data) : undefined;
-    console.log(`🔍 ${message}`, sanitizedData);
-  }
-
-  /**
-   * Log general information
-   */
-  info(message: string, data?: any) {
-    if (!this.shouldLog('info') || !this.config.enableConsole) return;
-    
-    const sanitizedData = data ? this.sanitize(data) : undefined;
-    console.log(`ℹ️ ${message}`, sanitizedData);
-  }
-
-  /**
-   * Log warnings
-   */
-  warn(message: string, data?: any) {
-    if (!this.shouldLog('warn') || !this.config.enableConsole) return;
-    
-    const sanitizedData = data ? this.sanitize(data) : undefined;
-    console.warn(`⚠️ ${message}`, sanitizedData);
-  }
-
-  /**
-   * Log errors (always logged)
-   */
-  error(message: string, error?: any) {
-    if (!this.config.enableConsole) return;
-    
-    const sanitizedError = error ? this.sanitize(error) : undefined;
-    console.error(`❌ ${message}`, sanitizedError);
-  }
-
-  /**
-   * Log transaction events with automatic sanitization
-   */
-  transaction(event: string, data?: any) {
-    if (!this.shouldLog('info') || !this.config.enableConsole) return;
-    
-    const sanitizedData = data ? this.sanitize(data) : undefined;
-    console.log(`🔗 Transaction ${event}`, sanitizedData);
-  }
-
-  /**
-   * Log blockchain events with automatic sanitization
-   */
-  blockchain(event: string, data?: any) {
-    if (!this.shouldLog('info') || !this.config.enableConsole) return;
-    
-    const sanitizedData = data ? this.sanitize(data) : undefined;
-    console.log(`⛓️ Blockchain ${event}`, sanitizedData);
-  }
-
-  /**
-   * Log property events
-   */
-  property(event: string, data?: any) {
-    if (!this.shouldLog('info') || !this.config.enableConsole) return;
-    
-    const sanitizedData = data ? this.sanitize(data) : undefined;
-    console.log(`🏠 Property ${event}`, sanitizedData);
-  }
-
-  /**
-   * Log investment events
-   */
-  investment(event: string, data?: any) {
-    if (!this.shouldLog('info') || !this.config.enableConsole) return;
-    
-    const sanitizedData = data ? this.sanitize(data) : undefined;
-    console.log(`💰 Investment ${event}`, sanitizedData);
+  investment(message: string, data?: any) {
+    this.log('info', `[INVESTMENT] ${message}`, data);
   }
 }
 
 // Export singleton instance
 export const logger = new SecureLogger();
-
-// Export for testing
 export { SecureLogger };

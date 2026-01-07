@@ -7,31 +7,27 @@ import {
   Heading,
   SimpleGrid,
   Text,
-  Select,
-  Stat,
   StatLabel,
   StatNumber,
   StatHelpText,
-  StatArrow,
   Progress,
   useColorModeValue,
   Badge,
   HStack,
   VStack,
   Icon,
-  Card,
   CardBody,
   Image,
 } from "@chakra-ui/react";
 import { useMemo, useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { FaLink, FaNetworkWired, FaWallet, FaChartLine, FaPercentage, FaHome } from "react-icons/fa";
-import { FiTrendingUp, FiDollarSign } from "react-icons/fi";
-import { NFT_CONTRACTS, type NftContract, getDefaultNftContract } from "@/consts/nft_contracts";
-import { useOneChainWallet } from "@/hooks/useOneChainWallet";
-import { oneChainService } from "@/services/onechain";
-import { useWalletStandard } from "@/hooks/useWalletStandard";
+import { FaLink, FaWallet, FaChartLine, FaHome } from "react-icons/fa";
+import { FiTrendingUp } from "react-icons/fi";
+import { useAccount } from "wagmi";
+import { propertyContractService } from "@/services/propertyContract";
 import { logger } from "@/utils/secureLogger";
+import { Card } from "@chakra-ui/react";
+import { ConnectButton } from "@rainbow-me/rainbowkit";
 
 const MotionBox = motion(Box);
 const MotionCard = motion(Card);
@@ -45,9 +41,9 @@ function getPropertyImage(propertyName: string, index: number): string {
     "https://images.unsplash.com/photo-1448630360428-65456885c650?w=400&h=200&fit=crop&crop=center", // House exterior
     "https://images.unsplash.com/photo-1564013799919-ab600027ffc6?w=400&h=200&fit=crop&crop=center", // Modern home
   ];
-  
-  // Use property name to determine image type
+
   const name = propertyName.toLowerCase();
+
   if (name.includes('hotel') || name.includes('resort')) {
     return "https://images.unsplash.com/photo-1566073771259-6a8506099945?w=400&h=200&fit=crop&crop=center";
   } else if (name.includes('office') || name.includes('commercial')) {
@@ -55,15 +51,12 @@ function getPropertyImage(propertyName: string, index: number): string {
   } else if (name.includes('apartment') || name.includes('condo')) {
     return "https://images.unsplash.com/photo-1582407947304-fd86f028f716?w=400&h=200&fit=crop&crop=center";
   }
-  
-  // Default to cycling through images based on index
+
   return images[index % images.length];
 }
 
 // Enhanced sparkline with better visuals
 function Sparkline({ data, height = 40 }: { data: number[]; height?: number }) {
-  const isDark = useColorModeValue(false, true);
-  
   if (!data.length || data.every(v => v === 0)) {
     return (
       <Box h={`${height}px`} display="flex" alignItems="center" justifyContent="center">
@@ -73,18 +66,18 @@ function Sparkline({ data, height = 40 }: { data: number[]; height?: number }) {
       </Box>
     );
   }
-  
+
   const max = Math.max(...data);
   const min = Math.min(...data);
   const range = Math.max(max - min, max * 0.1); // Ensure some range
   const stepX = 100 / Math.max(data.length - 1, 1);
-  
+
   const points = data
     .map((v, i) => `${i * stepX},${100 - ((v - min) / range) * 80 + 10}`) // Add padding
     .join(" ");
-    
+
   const areaPoints = `0,100 ${points} 100,100`;
-  
+
   return (
     <Box h={`${height}px`} position="relative">
       <svg viewBox="0 0 100 100" preserveAspectRatio="none" width="100%" height="100%">
@@ -98,23 +91,23 @@ function Sparkline({ data, height = 40 }: { data: number[]; height?: number }) {
             <stop offset="100%" stopColor="rgba(118,75,162,0.1)" />
           </linearGradient>
         </defs>
-        
+
         {/* Area fill */}
-        <polygon 
-          fill="url(#areaGradient)" 
+        <polygon
+          fill="url(#areaGradient)"
           points={areaPoints}
         />
-        
+
         {/* Line */}
-        <polyline 
-          fill="none" 
-          stroke="url(#lineGradient)" 
-          strokeWidth="3" 
+        <polyline
+          fill="none"
+          stroke="url(#lineGradient)"
+          strokeWidth="3"
           strokeLinecap="round"
           strokeLinejoin="round"
-          points={points} 
+          points={points}
         />
-        
+
         {/* Data points */}
         {data.map((v, i) => (
           <circle
@@ -127,54 +120,15 @@ function Sparkline({ data, height = 40 }: { data: number[]; height?: number }) {
           />
         ))}
       </svg>
-      
       {/* Value labels */}
       <Box position="absolute" top="0" left="0" fontSize="xs" color="gray.500">
-        {max > 0 ? `${max.toFixed(2)} OCT` : '0 OCT'}
+        {max > 0 ? `${max.toFixed(2)} MNT` : '0 MNT'}
       </Box>
       <Box position="absolute" bottom="0" right="0" fontSize="xs" color="gray.500">
-        {data.length > 0 ? `${data[data.length - 1].toFixed(2)} OCT` : '0 OCT'}
+        {data.length > 0 ? `${data[data.length - 1].toFixed(2)} MNT` : '0 MNT'}
       </Box>
     </Box>
   );
-}
-
-function isInCategory(metadata: any, category: "property" | "carbon"): boolean {
-  try {
-    const lower = Object.fromEntries(
-      Object.entries(metadata || {}).map(([k, v]) => [String(k).toLowerCase(), v])
-    );
-    const direct = String(
-      lower["category"] || lower["asset_type"] || lower["type"] || ""
-    ).toLowerCase();
-    if (category === "carbon" && direct.includes("carbon")) return true;
-    if (
-      category === "property" &&
-      (direct.includes("property") || direct.includes("real estate"))
-    )
-      return true;
-    const attrs = (metadata?.attributes || []) as Array<any>;
-    for (const a of attrs) {
-      const t = String(a?.trait_type || a?.traitType || "").toLowerCase();
-      if (["category", "asset_type", "type"].includes(t)) {
-        const v = String(a?.value || "").toLowerCase();
-        if (category === "carbon" && v.includes("carbon")) return true;
-        if (
-          category === "property" &&
-          (v.includes("property") || v.includes("real estate"))
-        )
-          return true;
-      }
-      if (t === "is_carbon") {
-        const v = String(a?.value || "").toLowerCase();
-        if (category === "carbon" && (v === "true" || v === "yes" || v === "1"))
-          return true;
-      }
-    }
-    return false;
-  } catch {
-    return false;
-  }
 }
 
 interface DashboardStats {
@@ -187,8 +141,7 @@ interface DashboardStats {
 }
 
 export default function Dashboard() {
-  const { account, isConnected } = useOneChainWallet();
-  const { account: walletAccount, balance } = useWalletStandard();
+  const { address, isConnected } = useAccount();
 
   const gradient = useColorModeValue(
     "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
@@ -197,28 +150,6 @@ export default function Dashboard() {
   const glassBg = useColorModeValue("rgba(255, 255, 255, 0.9)", "rgba(26, 32, 44, 0.9)");
   const textColor = useColorModeValue("gray.600", "gray.300");
 
-  // Define chain type
-  type Chain = {
-    id: string;
-    name: string;
-    isSupported?: boolean;
-  };
-
-  // TODO: wire these to actual chain-switching helpers when available
-  const isOnSupportedChain = true;
-  const switchToDefaultChain = () => { };
-
-  // Initialize with proper type
-  const [currentChain, setCurrentChain] = useState<Chain | null>({
-    id: 'onechain',
-    name: 'OneChain',
-    isSupported: true
-  });
-  const [selectedCollection, setSelectedCollection] = useState<NftContract | null>(
-    getDefaultNftContract() || (NFT_CONTRACTS.length > 0 ? NFT_CONTRACTS[0] : null)
-  );
-
-  // Real dashboard data
   const [dashboardStats, setDashboardStats] = useState<DashboardStats>({
     totalInvestments: 0,
     totalValue: 0,
@@ -232,43 +163,38 @@ export default function Dashboard() {
 
   // Load dashboard data
   useEffect(() => {
-    if (isConnected && (account?.address || walletAccount?.address)) {
+    if (isConnected && address) {
       loadDashboardData();
     }
-  }, [isConnected, account?.address, walletAccount?.address]);
+  }, [isConnected, address]);
 
   const loadDashboardData = async () => {
+    if (!address) return;
+
     setIsLoading(true);
     try {
-      const userAddress = account?.address || walletAccount?.address;
-      if (!userAddress) {
-        setIsLoading(false);
-        return;
-      }
+      console.log('Dashboard loading investments for:', address);
 
-      // Import propertyContractService for better structured data
+      // Get user's actual on-chain investments
       const { propertyContractService } = await import('@/services/propertyContract');
+      const userInvestments = await propertyContractService.getUserInvestments(address);
 
-      // Get user's investments from blockchain using propertyContractService
-      const userInvestments = await propertyContractService.getUserInvestments(userAddress);
+      console.log('Dashboard found on-chain investments:', userInvestments);
 
-      // Use secure logging to avoid exposing sensitive data
-      logger.investment('Dashboard loading investments', { count: userInvestments.length });
-
-      // Calculate stats from real blockchain data
+      // Calculate stats
       let totalValue = 0;
       let totalShares = 0;
       let totalYield = 0;
       let propertyCount = 0;
       let carbonCount = 0;
 
-      const processedInvestments = userInvestments.map((investment: any, index: number) => {
-        const sharesOwned = investment.shares || 0;
-        const investmentAmount = investment.investmentAmount || 0;
-        const propertyDetails = investment.propertyDetails;
+      const processedInvestments = userInvestments.map((inv: any, index: number) => {
+        const sharesOwned = inv.shares || 0;
+        const investmentAmount = inv.investmentAmount || 0;
+        const propertyDetails = inv.propertyDetails;
 
-        // Get yield from property details - handle different field names
-        const yieldStr = propertyDetails?.rentalYield || propertyDetails?.yield || propertyDetails?.expectedYield || '0';
+        // Get yield from property details
+        const yieldStr = propertyDetails?.rentalYield || '0';
         const yield_ = parseFloat(yieldStr.toString().replace('%', '')) || 0;
 
         // Accumulate totals
@@ -276,53 +202,40 @@ export default function Dashboard() {
         totalValue += investmentAmount;
         totalYield += yield_;
 
-        // Categorize by property type
-        const propertyType = propertyDetails?.propertyType?.toLowerCase() || propertyDetails?.type?.toLowerCase() || '';
+        // Categorize
+        const propertyType = propertyDetails?.propertyType?.toLowerCase() || '';
         if (propertyType.includes('carbon') || propertyType.includes('renewable') || propertyType.includes('green')) {
           carbonCount++;
         } else {
           propertyCount++;
         }
 
-        // Return formatted investment data
         return {
-          id: investment.id,
-          propertyId: investment.propertyId,
-          propertyName: investment.propertyName || 'Unknown Property',
+          id: inv.id,
+          propertyId: inv.propertyId,
+          propertyName: inv.propertyName || 'Unknown Property',
           sharesOwned: sharesOwned,
           investmentAmount: investmentAmount,
           yield: yield_,
           location: propertyDetails?.location || '',
-          imageUrl: propertyDetails?.imageUrl || propertyDetails?.image || getPropertyImage(investment.propertyName || 'Property', index),
-          timestamp: investment.timestamp,
+          imageUrl: propertyDetails?.imageUrl || getPropertyImage(inv.propertyName || 'Property', index),
+          timestamp: Date.now(),
           propertyDetails: propertyDetails
         };
       });
 
-      // Update dashboard stats with real data
-      const newStats = {
+      setDashboardStats({
         totalInvestments: processedInvestments.length,
         totalValue,
         totalShares,
         averageYield: processedInvestments.length > 0 ? totalYield / processedInvestments.length : 0,
         propertyCount,
         carbonCount
-      };
-
-      // Stats calculated successfully - using secure logging to avoid exposing sensitive data
-      logger.investment('Dashboard stats calculated', { 
-        totalInvestments: newStats.totalInvestments,
-        totalValue: newStats.totalValue,
-        totalShares: newStats.totalShares
       });
-
-      setDashboardStats(newStats);
       setInvestments(processedInvestments);
 
     } catch (error) {
-      logger.error('Failed to load dashboard data', error);
-
-      // On error, show empty state
+      console.error('Failed to load dashboard data:', error);
       setDashboardStats({
         totalInvestments: 0,
         totalValue: 0,
@@ -340,7 +253,6 @@ export default function Dashboard() {
   // Generate sparkline data based on real portfolio performance
   const sparkData = useMemo(() => {
     if (investments.length === 0 || dashboardStats.totalValue === 0) {
-      // Show empty state line
       return [0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
     }
 
@@ -348,7 +260,7 @@ export default function Dashboard() {
     const avgYield = dashboardStats.averageYield / 100;
     const data = [];
 
-    // Create realistic growth trend based on actual data
+    // Create realistic growth trend
     for (let i = 0; i < 10; i++) {
       const timeProgress = i / 9;
       const yieldGrowth = baseValue * avgYield * timeProgress * 0.5; // More realistic growth
@@ -358,9 +270,6 @@ export default function Dashboard() {
 
     return data;
   }, [investments, dashboardStats]);
-
-  const oneChainContracts = NFT_CONTRACTS;
-  const isOneChainSelected = true;
 
   return (
     <Box
@@ -429,21 +338,19 @@ export default function Dashboard() {
                   >
                     Investor Dashboard
                   </Heading>
-                  {isOneChainSelected && (
-                    <Badge
-                      bgGradient="linear(to-r, purple.600, blue.600)"
-                      color="white"
-                      px={3}
-                      py={1}
-                      rounded="full"
-                      fontWeight="700"
-                    >
-                      <HStack spacing={1}>
-                        <Icon as={FaLink} boxSize={3} />
-                        <Text fontSize="xs">OneChain</Text>
-                      </HStack>
-                    </Badge>
-                  )}
+                  <Badge
+                    bgGradient="linear(to-r, purple.600, blue.600)"
+                    color="white"
+                    px={3}
+                    py={1}
+                    rounded="full"
+                    fontWeight="700"
+                  >
+                    <HStack spacing={1}>
+                      <Icon as={FaLink} boxSize={3} />
+                      <Text fontSize="xs">Mantle</Text>
+                    </HStack>
+                  </Badge>
                 </HStack>
                 <Text color={textColor} fontSize="sm" fontFamily="Inter">
                   {isConnected
@@ -453,26 +360,7 @@ export default function Dashboard() {
               </VStack>
 
               <VStack align="end" spacing={2}>
-                <Select
-                  maxW="320px"
-                  value={selectedCollection?.address || ''}
-                  onChange={(e) => {
-                    const next = NFT_CONTRACTS.find((c) => c.address === e.target.value);
-                    if (next) setSelectedCollection(next);
-                  }}
-                  bg="white"
-                  color="gray.800"
-                  rounded="xl"
-                  fontWeight="600"
-                  _dark={{ bg: "gray.700", color: "white" }}
-                >
-                  {oneChainContracts.map((c) => (
-                    <option key={c.address} value={c.address}>
-                      {(c.title ?? c.slug ?? c.address.slice(0, 8))}
-                    </option>
-                  ))}
-                </Select>
-                <Text fontSize="xs" color={textColor}>OneChain • {selectedCollection?.type || 'N/A'}</Text>
+                <ConnectButton />
               </VStack>
             </Flex>
           </Box>
@@ -489,8 +377,8 @@ export default function Dashboard() {
           />
           <PremiumStatCard
             label="Portfolio Value"
-            value={`${dashboardStats.totalValue.toFixed(2)} OCT`}
-            hint={isConnected ? `Wallet: ${(parseFloat(balance || '0') / 100_000_000).toFixed(4)} OCT` : "Connect wallet"}
+            value={`${dashboardStats.totalValue.toFixed(2)} MNT`}
+            hint={isConnected && address ? `Wallet Connected` : "Connect wallet"}
             icon={FaWallet}
             delay={0.1}
           />
@@ -643,8 +531,8 @@ export default function Dashboard() {
                     {isConnected ? "No investments yet" : "Connect your wallet"}
                   </Text>
                   <Text color={textColor} fontSize="sm" textAlign="center" maxW="300px">
-                    {isConnected 
-                      ? "Start building your tokenized real estate portfolio by investing in properties from our collection." 
+                    {isConnected
+                      ? "Start building your tokenized real estate portfolio by investing in properties from our collection."
                       : "Connect your wallet to view your investment portfolio and track your tokenized asset holdings."}
                   </Text>
                 </VStack>
@@ -756,7 +644,6 @@ function InvestmentCard({ investment, index }: { investment: any; index: number 
           objectFit="cover"
           fallbackSrc="https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=400&h=200&fit=crop&crop=center"
           onError={(e) => {
-            // Fallback to a different property image if the first one fails
             const target = e.target as HTMLImageElement;
             if (!target.src.includes('unsplash')) {
               target.src = "https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=400&h=200&fit=crop&crop=center";
@@ -781,7 +668,7 @@ function InvestmentCard({ investment, index }: { investment: any; index: number 
                 Investment
               </Text>
               <Text fontSize="lg" fontWeight="800" color="green.600" fontFamily="Outfit">
-                {investment.investmentAmount?.toFixed(2)} OCT
+                {investment.investmentAmount?.toFixed(2)} MNT
               </Text>
             </Flex>
           </VStack>

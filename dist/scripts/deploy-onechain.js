@@ -1,0 +1,147 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.deployToMantle = deployToMantle;
+const client_1 = require("@mysten/sui/client");
+const ed25519_1 = require("@mysten/sui/keypairs/ed25519");
+const transactions_1 = require("@mysten/sui/transactions");
+const fs_1 = require("fs");
+const path_1 = require("path");
+// Mantle Testnet Configuration
+const Mantle_TESTNET_RPC = 'https://testnet-rpc.Mantle.one';
+const FAUCET_URL = 'https://faucet.testnet.Mantle.one';
+async function deployToMantle() {
+    console.log('🚀 Deploying RWA Exchange to Mantle Testnet...');
+    try {
+        // Initialize Mantle client
+        const client = new client_1.SuiClient({ url: Mantle_TESTNET_RPC });
+        console.log(`📡 Connected to Mantle Testnet: ${Mantle_TESTNET_RPC}`);
+        // Generate or load keypair
+        let keypair;
+        const keypairPath = (0, path_1.join)(process.cwd(), '.Mantle-keypair');
+        if ((0, fs_1.existsSync)(keypairPath)) {
+            console.log('🔑 Loading existing keypair...');
+            const keypairData = (0, fs_1.readFileSync)(keypairPath, 'utf8');
+            const secretKey = Uint8Array.from(Buffer.from(keypairData, 'hex'));
+            keypair = ed25519_1.Ed25519Keypair.fromSecretKey(secretKey);
+        }
+        else {
+            console.log('🔑 Generating new keypair...');
+            keypair = new ed25519_1.Ed25519Keypair();
+            const secretKey = keypair.getSecretKey();
+            (0, fs_1.writeFileSync)(keypairPath, Buffer.from(secretKey).toString('hex'));
+            console.log('💾 Keypair saved to .Mantle-keypair');
+        }
+        const address = keypair.getPublicKey().toSuiAddress();
+        console.log(`👤 Deployer address: ${address}`);
+        // Check balance
+        try {
+            const balance = await client.getBalance({ owner: address });
+            console.log(`💰 Balance: ${balance.totalBalance} MIST (${parseInt(balance.totalBalance) / 1e9} ONE)`);
+            if (parseInt(balance.totalBalance) < 1e8) { // Less than 0.1 ONE
+                console.log('⚠️  Low balance detected. Please fund your wallet:');
+                console.log(`   Mantle Testnet Faucet: ${FAUCET_URL}`);
+                console.log(`   Your address: ${address}`);
+                console.log('   Please fund your wallet and run the script again.');
+                return;
+            }
+        }
+        catch (error) {
+            console.log('⚠️  Could not check balance. Proceeding with deployment...');
+        }
+        // For now, let's create a simple transaction to test the connection
+        // and then use placeholder addresses that we'll update later
+        console.log('🔨 Creating test transaction...');
+        const tx = new transactions_1.Transaction();
+        tx.setGasBudget(10000000); // 0.01 ONE
+        try {
+            const result = await client.signAndExecuteTransaction({
+                signer: keypair,
+                transaction: tx,
+                options: {
+                    showEffects: true,
+                    showObjectChanges: true,
+                },
+            });
+            console.log('✅ Test transaction successful!');
+            console.log(`📋 Transaction digest: ${result.digest}`);
+            // For now, we'll use the EchoVillage contract as a reference
+            // and create placeholder deployment info
+            const deploymentInfo = {
+                network: 'Mantle-testnet',
+                rpcUrl: Mantle_TESTNET_RPC,
+                deployerAddress: address,
+                timestamp: new Date().toISOString(),
+                contracts: {
+                    // These will be updated when we have actual Move contracts deployed
+                    PropertyNFT: '0x7b8e0864967427679b4e129f79dc332a885c6087ec9e187b53451a9006ee15f2', // Example from EchoVillage
+                    Fractionalizer: '0x7b8e0864967427679b4e129f79dc332a885c6087ec9e187b53451a9006ee15f2', // Placeholder
+                },
+                testTransactionDigest: result.digest,
+            };
+            const deploymentPath = (0, path_1.join)(process.cwd(), 'Mantle-deployment.json');
+            (0, fs_1.writeFileSync)(deploymentPath, JSON.stringify(deploymentInfo, null, 2));
+            console.log('💾 Deployment info saved to Mantle-deployment.json');
+            // Update the frontend configuration
+            await updateFrontendConfig(deploymentInfo.contracts);
+            console.log('\n🎉 Mantle connection established successfully!');
+            console.log('📝 Next steps:');
+            console.log('1. Deploy actual Move contracts using Mantle CLI');
+            console.log('2. Update the contract addresses in the deployment file');
+            console.log('3. Test the marketplace functionality');
+        }
+        catch (error) {
+            console.error('❌ Transaction failed:', error);
+        }
+    }
+    catch (error) {
+        console.error('❌ Deployment failed:', error);
+        process.exit(1);
+    }
+}
+async function updateFrontendConfig(contracts) {
+    console.log('🔄 Updating frontend configuration...');
+    try {
+        // Update NFT contracts configuration
+        const nftContractsPath = (0, path_1.join)(process.cwd(), 'src', 'consts', 'nft_contracts.ts');
+        if ((0, fs_1.existsSync)(nftContractsPath)) {
+            let content = (0, fs_1.readFileSync)(nftContractsPath, 'utf8');
+            // Replace the first placeholder address with PropertyNFT address
+            content = content.replace(/address: "0x0000000000000000000000000000000000000000"/, `address: "${contracts.PropertyNFT}"`);
+            // Replace the second placeholder address with Fractionalizer address
+            content = content.replace(/address: "0x0000000000000000000000000000000000000000"/, `address: "${contracts.Fractionalizer}"`);
+            (0, fs_1.writeFileSync)(nftContractsPath, content);
+            console.log('✅ Updated NFT contracts configuration');
+        }
+        // Create or update environment variables
+        const envPath = (0, path_1.join)(process.cwd(), '.env.local');
+        let envContent = '';
+        if ((0, fs_1.existsSync)(envPath)) {
+            envContent = (0, fs_1.readFileSync)(envPath, 'utf8');
+        }
+        // Add Mantle configuration
+        const envVars = [
+            `NEXT_PUBLIC_Mantle_RPC_URL=${Mantle_TESTNET_RPC}`,
+            `NEXT_PUBLIC_PROPERTY_NFT_ADDRESS=${contracts.PropertyNFT}`,
+            `NEXT_PUBLIC_FRACTIONALIZER_ADDRESS=${contracts.Fractionalizer}`,
+            `NEXT_PUBLIC_NETWORK=Mantle-testnet`,
+        ];
+        envVars.forEach(envVar => {
+            const [key] = envVar.split('=');
+            if (envContent.includes(key)) {
+                envContent = envContent.replace(new RegExp(`${key}=.*`), envVar);
+            }
+            else {
+                envContent += `\n${envVar}`;
+            }
+        });
+        (0, fs_1.writeFileSync)(envPath, envContent);
+        console.log('✅ Updated environment variables');
+    }
+    catch (error) {
+        console.warn('⚠️  Could not update frontend configuration:', error);
+    }
+}
+// Run deployment
+if (require.main === module) {
+    deployToMantle().catch(console.error);
+}

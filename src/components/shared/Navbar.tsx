@@ -13,28 +13,23 @@ import {
   Image,
   useColorMode,
   HStack,
-  Text,
 } from "@chakra-ui/react";
 import { blo } from "blo";
 import { FaRegMoon } from "react-icons/fa";
 import { FiUser } from "react-icons/fi";
 import { IoSunny } from "react-icons/io5";
 import { SideMenu } from "./SideMenu";
-import { DappKitWalletButton } from "@/components/DappKitWalletButton";
-import { useDappKit } from "@/hooks/useDappKit";
+import { ConnectButton } from "@rainbow-me/rainbowkit";
+import { useAccount, useDisconnect } from "wagmi";
 import { usePathname } from "next/navigation";
 
 export function Navbar() {
-  const {
-    isConnected,
-    account,
-    disconnect
-  } = useDappKit();
-
+  const { address, isConnected } = useAccount();
+  const { disconnect } = useDisconnect();
   const pathname = usePathname();
 
   const handleLogout = async () => {
-    await disconnect();
+    disconnect();
   };
 
   const isActive = (path: string) => pathname === path;
@@ -72,7 +67,7 @@ export function Navbar() {
         <HStack spacing={3}>
           <Image
             src="/logo.png"
-            alt="OneRWA Logo"
+            alt="MantleRWA Logo"
             height={{ base: "32px", md: "38px" }}
             width="auto"
             filter="drop-shadow(0 2px 8px rgba(102, 126, 234, 0.3))"
@@ -99,7 +94,7 @@ export function Navbar() {
               transform: "translateY(-1px)"
             }}
           >
-            OneRWA
+            MantleRWA
           </Heading>
         </HStack>
       </Flex>
@@ -147,9 +142,9 @@ export function Navbar() {
       >
         <HStack spacing={2}>
           <ToggleThemeButton />
-          <DappKitWalletButton />
-          {isConnected && account?.address && (
-            <ProfileButton address={account.address} onLogout={handleLogout} />
+          <ConnectButton />
+          {isConnected && address && (
+            <ProfileButton address={address} onLogout={handleLogout} />
           )}
         </HStack>
       </Flex>

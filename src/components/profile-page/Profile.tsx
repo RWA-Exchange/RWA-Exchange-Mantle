@@ -1,18 +1,18 @@
-import { 
-  Box, 
-  Flex, 
-  Heading, 
-  Img, 
-  Text, 
-  VStack, 
-  HStack, 
-  Card, 
-  CardBody, 
-  SimpleGrid, 
-  Badge, 
-  Stat, 
-  StatLabel, 
-  StatNumber, 
+import {
+  Box,
+  Flex,
+  Heading,
+  Img,
+  Text,
+  VStack,
+  HStack,
+  Card,
+  CardBody,
+  SimpleGrid,
+  Badge,
+  Stat,
+  StatLabel,
+  StatNumber,
   StatHelpText,
   Spinner,
   Alert,
@@ -23,8 +23,7 @@ import {
 } from "@chakra-ui/react";
 import { blo } from "blo";
 import { useMemo, useEffect, useState } from "react";
-import { oneChainService } from "@/services/onechain";
-import { useWalletStandard } from "@/hooks/useWalletStandard";
+import { useAccount, useBalance } from "wagmi";
 import { FaExternalLinkAlt, FaCoins, FaHome, FaChartLine } from "react-icons/fa";
 
 type Props = { address: string };
@@ -54,8 +53,9 @@ interface PortfolioStats {
 
 export function ProfileSection({ address }: Props) {
   const avatar = useMemo(() => blo((address || "0x").slice(0, 42) as `0x${string}`), [address]);
-  const { isConnected, balance } = useWalletStandard();
-  
+  const { isConnected } = useAccount();
+  const { data: balanceData } = useBalance({ address: address as `0x${string}` });
+
   const [investments, setInvestments] = useState<Investment[]>([]);
   const [portfolioStats, setPortfolioStats] = useState<PortfolioStats>({
     totalInvestments: 0,
@@ -89,60 +89,50 @@ export function ProfileSection({ address }: Props) {
   const loadUserInvestments = async () => {
     setIsLoading(true);
     setError(null);
-    
+
     try {
-      // Get user's investments from local tracking
-      const { investmentTracker } = await import('@/services/investmentTracker');
-      const userInvestments = investmentTracker.getUserInvestments(address);
-      
       console.log('Loading investments for user:', address);
-      console.log('Found investments:', userInvestments);
-      
-      // Convert tracked investments to profile format
-      const trackedInvestments: Investment[] = userInvestments.map(inv => ({
+
+      // Fetch user's actual on-chain investments
+      const { propertyContractService } = await import('@/services/propertyContract');
+      const userInvestments = await propertyContractService.getUserInvestments(address);
+
+      console.log('Found on-chain investments:', userInvestments);
+
+      // Convert to profile format
+      const profileInvestments: Investment[] = userInvestments.map(inv => ({
         id: inv.id,
-        propertyId: inv.assetId,
-        propertyName: inv.assetName,
-        sharesOwned: inv.sharesOwned,
-        investmentAmount: inv.investmentAmount / 100, // Convert cents to dollars
-        timestamp: inv.timestamp,
-        imageUrl: inv.imageUrl,
-        currentValue: (inv.sharesOwned * inv.pricePerShare) / 100, // Convert cents to dollars
-        rentalYield: inv.rentalYield
+        propertyId: inv.propertyId,
+        propertyName: inv.propertyName,
+        sharesOwned: inv.shares,
+        investmentAmount: inv.investmentAmount,
+        timestamp: Date.now(), // Using current time as fallback
+        imageUrl: inv.propertyDetails?.imageUrl || '',
+        currentValue: inv.shares * parseFloat(inv.propertyDetails?.pricePerShare || '0'),
+        rentalYield: inv.propertyDetails?.rentalYield || '0'
       }));
-      
-      // If user has tracked investments, use them
-      if (trackedInvestments.length > 0) {
-        setInvestments(trackedInvestments);
-        
-        // Calculate portfolio stats from tracked investments
-        const stats = investmentTracker.getUserPortfolioStats(address);
+
+      setInvestments(profileInvestments);
+
+      // Calculate portfolio stats
+      if (profileInvestments.length > 0) {
+        const totalInvestments = profileInvestments.reduce((sum, inv) => sum + inv.investmentAmount, 0);
+        const totalValue = profileInvestments.reduce((sum, inv) => sum + inv.currentValue, 0);
+        const totalShares = profileInvestments.reduce((sum, inv) => sum + inv.sharesOwned, 0);
+        const avgYield = profileInvestments.reduce((sum, inv) => sum + parseFloat(inv.rentalYield || '0'), 0) / profileInvestments.length;
+
         setPortfolioStats({
-          totalInvestments: stats.totalInvestments,
-          totalValue: stats.totalValue,
-          totalShares: stats.totalShares,
-          averageYield: stats.averageYield
+          totalInvestments,
+          totalValue,
+          totalShares,
+          averageYield: avgYield
         });
-        
-        console.log('Loaded', trackedInvestments.length, 'tracked investments');
-      } else {
-        // If no tracked investments, show sample data for demo
-        // Show empty state for new users
-        setInvestments([]);
-        setPortfolioStats({
-          totalInvestments: 0,
-          totalValue: 0,
-          totalShares: 0,
-          averageYield: 0
-        });
-        
-        console.log('No investments found for user');
       }
-      
-    } catch (err) {
-      console.error('Failed to load user investments:', err);
-      setError(err instanceof Error ? err.message : 'Failed to load investments');
-    } finally {
+
+      setIsLoading(false);
+    } catch (err: any) {
+      console.error('Error loading user profile:', err);
+      setError(err.message || 'Failed to load profile');
       setIsLoading(false);
     }
   };
@@ -167,7 +157,7 @@ export function ProfileSection({ address }: Props) {
             <HStack mt={2}>
               <Badge colorScheme="green">Connected</Badge>
               <Text fontSize="sm" color="gray.500">
-                Balance: {(parseFloat(balance) / 1e9).toFixed(4)} ONE
+                Balance: {balanceData ? parseFloat(balanceData.formatted).toFixed(4) : '0'} {balanceData?.symbol || 'MNT'}
               </Text>
             </HStack>
           )}
@@ -258,40 +248,40 @@ export function ProfileSection({ address }: Props) {
                             objectFit="cover"
                             rounded="md"
                           />
-                          
+
                           <VStack spacing={2} w="full">
                             <Heading size="sm" textAlign="center">
                               {investment.propertyName}
                             </Heading>
-                            
+
                             <HStack justify="space-between" w="full">
                               <Text fontSize="sm" color="gray.500">Shares:</Text>
                               <Badge colorScheme="blue">{investment.sharesOwned}</Badge>
                             </HStack>
-                            
+
                             <HStack justify="space-between" w="full">
                               <Text fontSize="sm" color="gray.500">Invested:</Text>
                               <Text fontSize="sm" fontWeight="600">
                                 {formatCurrency(investment.investmentAmount)}
                               </Text>
                             </HStack>
-                            
+
                             <HStack justify="space-between" w="full">
                               <Text fontSize="sm" color="gray.500">Current Value:</Text>
                               <Text fontSize="sm" fontWeight="600" color="green.500">
                                 {formatCurrency(investment.currentValue)}
                               </Text>
                             </HStack>
-                            
+
                             <HStack justify="space-between" w="full">
                               <Text fontSize="sm" color="gray.500">Yield:</Text>
                               <Badge colorScheme="purple" variant="subtle">
                                 {investment.rentalYield}
                               </Badge>
                             </HStack>
-                            
+
                             <Divider />
-                            
+
                             <HStack justify="space-between" w="full">
                               <Text fontSize="xs" color="gray.400">
                                 Invested: {formatDate(investment.timestamp)}

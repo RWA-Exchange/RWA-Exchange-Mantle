@@ -66,9 +66,10 @@ import {
     FaFileContract
 } from "react-icons/fa";
 import { useMarketplaceContext } from "@/hooks/useMarketplaceContext";
-import { useWalletStandard } from "@/hooks/useWalletStandard";
+import { useAccount, useConnect } from "wagmi";
+import { ConnectButton } from "@rainbow-me/rainbowkit";
 
-import { WalletSyncUtil } from "@/utils/walletSync";
+// import { WalletSyncUtil } from "@/utils/walletSync"; // Likely legacy, removing
 import { motion } from "framer-motion";
 
 const MotionBox = motion(Box);
@@ -93,27 +94,12 @@ export function Token({ tokenId }: TokenProps) {
         refresh
     } = useMarketplaceContext();
 
-    const { isConnected, connect, account, checkConnectionState } = useWalletStandard();
+    const { isConnected, address } = useAccount();
     const toast = useToast();
 
-    // Refresh wallet connection state on component mount and periodically
-    useEffect(() => {
-        const refreshConnection = async () => {
-            try {
-                await checkConnectionState();
-            } catch (error) {
-                console.warn('Failed to refresh wallet connection state:', error);
-            }
-        };
+    // Removed manual refresh connection logic as Wagmi handles this automatically
 
-        refreshConnection();
-        
-        // Set up periodic refresh every 2 seconds to keep connection state in sync
-        const interval = setInterval(refreshConnection, 2000);
-        
-        return () => clearInterval(interval);
-    }, [checkConnectionState]);
-
+    // ... existing state and logic ...
     const [buyingAsset, setBuyingAsset] = useState(false);
     const [claimingDividends, setClaimingDividends] = useState(false);
     const [activeTab, setActiveTab] = useState(0);
@@ -185,10 +171,10 @@ export function Token({ tokenId }: TokenProps) {
         if (!asset || !listing) return;
 
         setBuyingAsset(true);
-        
+
         try {
             // Simple wallet connection check first
-            if (!isConnected || !account) {
+            if (!isConnected || !address) {
                 toast({
                     title: "Wallet not connected",
                     description: "Please connect your wallet to make a purchase",
@@ -196,7 +182,6 @@ export function Token({ tokenId }: TokenProps) {
                     duration: 3000,
                     isClosable: true,
                 });
-                await connect();
                 return;
             }
 
@@ -205,12 +190,12 @@ export function Token({ tokenId }: TokenProps) {
             setShowTransactionSuccess(true);
             // Auto-hide after 30 seconds
             setTimeout(() => setShowTransactionSuccess(false), 30000);
-            
+
             // Update available shares locally for immediate UI feedback
             if (listing.fractionalShares) {
                 listing.fractionalShares.availableShares -= 1;
             }
-            
+
             toast({
                 title: "Purchase successful!",
                 description: `Asset purchased successfully! View transaction details below.`,
@@ -238,10 +223,10 @@ export function Token({ tokenId }: TokenProps) {
         if (!asset) return;
 
         setBuyingAsset(true);
-        
+
         try {
             // Simple wallet connection check first
-            if (!isConnected || !account) {
+            if (!isConnected || !address) {
                 toast({
                     title: "Wallet not connected",
                     description: "Please connect your wallet to invest",
@@ -249,7 +234,6 @@ export function Token({ tokenId }: TokenProps) {
                     duration: 3000,
                     isClosable: true,
                 });
-                await connect();
                 return;
             }
 
@@ -258,14 +242,14 @@ export function Token({ tokenId }: TokenProps) {
             setShowTransactionSuccess(true);
             // Auto-hide after 30 seconds
             setTimeout(() => setShowTransactionSuccess(false), 30000);
-            
+
             // Update available shares locally for immediate UI feedback
             if (listing?.fractionalShares) {
                 listing.fractionalShares.availableShares -= 1;
             } else if (asset.metadata.availableShares) {
                 asset.metadata.availableShares -= 1;
             }
-            
+
             toast({
                 title: "Investment successful!",
                 description: `Investment completed successfully! View transaction details below.`,
@@ -415,7 +399,7 @@ export function Token({ tokenId }: TokenProps) {
                                             Transaction Successful!
                                         </Heading>
                                         <Text color="green.600" fontSize="sm">
-                                            Your transaction has been confirmed on the OneChain network
+                                            Your transaction has been confirmed on the Mantle network
                                         </Text>
                                     </VStack>
                                     <Button
@@ -427,7 +411,7 @@ export function Token({ tokenId }: TokenProps) {
                                         ✕
                                     </Button>
                                 </HStack>
-                                
+
                                 <Box
                                     w="full"
                                     p={4}
@@ -474,7 +458,7 @@ export function Token({ tokenId }: TokenProps) {
                                         </Box>
                                         <HStack spacing={2} w="full">
                                             <Link
-                                                href={`https://testnet.suivision.xyz/txblock/${lastTransactionHash}`}
+                                                href={`https://sepolia.mantlescan.xyz/tx/${lastTransactionHash}`}
                                                 isExternal
                                                 flex={1}
                                             >
@@ -485,22 +469,7 @@ export function Token({ tokenId }: TokenProps) {
                                                     w="full"
                                                     rightIcon={<FaExternalLinkAlt />}
                                                 >
-                                                    View on SuiVision
-                                                </Button>
-                                            </Link>
-                                            <Link
-                                                href={`https://suiscan.xyz/testnet/tx/${lastTransactionHash}`}
-                                                isExternal
-                                                flex={1}
-                                            >
-                                                <Button
-                                                    size="sm"
-                                                    colorScheme="purple"
-                                                    variant="outline"
-                                                    w="full"
-                                                    rightIcon={<FaExternalLinkAlt />}
-                                                >
-                                                    View on SuiScan
+                                                    View on Mantlescan
                                                 </Button>
                                             </Link>
                                         </HStack>

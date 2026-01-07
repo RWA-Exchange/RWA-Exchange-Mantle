@@ -6,13 +6,13 @@ import { readFileSync, writeFileSync, existsSync, readdirSync } from 'fs';
 import { join } from 'path';
 import { execSync } from 'child_process';
 
-// Configuration for OneChain
-const NETWORK = 'onechain-testnet';
-const RPC_URL = 'https://testnet-rpc.onechain.one';
+// Configuration for Mantle
+const NETWORK = 'Mantle-testnet';
+const RPC_URL = 'https://testnet-rpc.Mantle.one';
 
 async function deployContract() {
   console.log('🚀 Starting RWA Exchange Move contract deployment...');
-  
+
   try {
     // Initialize Sui client
     const client = new SuiClient({ url: RPC_URL });
@@ -21,7 +21,7 @@ async function deployContract() {
     // Load or create keypair
     let keypair: Ed25519Keypair;
     const keypairPath = join(process.cwd(), '.sui-keypair');
-    
+
     if (existsSync(keypairPath)) {
       console.log('🔑 Loading existing keypair...');
       const keypairData = readFileSync(keypairPath, 'utf8');
@@ -55,9 +55,9 @@ async function deployContract() {
     // Build the Move package
     try {
       console.log('🔨 Building Move package...');
-      execSync('sui move build', { 
-        cwd: movePackagePath, 
-        stdio: 'inherit' 
+      execSync('sui move build', {
+        cwd: movePackagePath,
+        stdio: 'inherit'
       });
     } catch (buildError) {
       console.error('❌ Failed to build Move package:', buildError);
@@ -67,7 +67,7 @@ async function deployContract() {
     // Read the compiled bytecode
     const buildDir = join(movePackagePath, 'build', 'rwa_exchange');
     const bytecodeModulesPath = join(buildDir, 'bytecode_modules');
-    
+
     if (!existsSync(bytecodeModulesPath)) {
       console.error('❌ Bytecode modules not found. Make sure the Move package built successfully.');
       return;
@@ -118,7 +118,7 @@ async function deployContract() {
 
     if (packageId) {
       console.log(`📦 Package ID: ${packageId}`);
-      
+
       // Save deployment info
       const deploymentInfo = {
         network: NETWORK,
@@ -138,7 +138,7 @@ async function deployContract() {
 
       console.log('\n🎉 Deployment completed successfully!');
       console.log(`🔗 View on Sui Explorer: https://suiexplorer.com/object/${packageId}?network=${NETWORK}`);
-      
+
     } else {
       console.error('❌ Could not extract package ID from deployment result');
     }
@@ -151,26 +151,26 @@ async function deployContract() {
 
 async function updateContractConstants(packageId: string) {
   console.log('🔄 Updating contract constants in frontend...');
-  
+
   try {
     // Update the NFT contracts configuration
     const nftContractsPath = join(process.cwd(), 'src', 'consts', 'nft_contracts.ts');
-    
+
     if (existsSync(nftContractsPath)) {
       let content = readFileSync(nftContractsPath, 'utf8');
-      
+
       // Replace the placeholder package ID
       content = content.replace(
         /packageId:\s*['"][^'"]*['"]/g,
         `packageId: '${packageId}'`
       );
-      
+
       // Update the address field as well
       content = content.replace(
         /address:\s*['"][^'"]*['"]/g,
         `address: '${packageId}'`
       );
-      
+
       writeFileSync(nftContractsPath, content);
       console.log('✅ Updated NFT contracts configuration');
     }
@@ -178,11 +178,11 @@ async function updateContractConstants(packageId: string) {
     // Create or update environment variables
     const envPath = join(process.cwd(), '.env.local');
     let envContent = '';
-    
+
     if (existsSync(envPath)) {
       envContent = readFileSync(envPath, 'utf8');
     }
-    
+
     // Update or add the package ID
     if (envContent.includes('NEXT_PUBLIC_RWA_PACKAGE_ID')) {
       envContent = envContent.replace(
@@ -192,10 +192,10 @@ async function updateContractConstants(packageId: string) {
     } else {
       envContent += `\nNEXT_PUBLIC_RWA_PACKAGE_ID=${packageId}\n`;
     }
-    
+
     writeFileSync(envPath, envContent);
     console.log('✅ Updated environment variables');
-    
+
   } catch (error) {
     console.warn('⚠️  Could not update contract constants:', error);
   }

@@ -2,16 +2,12 @@
 
 import { Token } from "@/components/token-page/TokenPage";
 
-export default function TokenPage({
-  params,
-}: {
-  params: { 
-    chainId: string;
-    contractAddress: string;
-    tokenId: string;
-  };
-}) {
-  const { tokenId } = params;
+import { useParams } from "next/navigation";
+
+export default function TokenPage() {
+  const params = useParams();
+  const tokenId = params.tokenId as string;
+
   if (!tokenId) {
     throw new Error("Missing tokenId");
   }

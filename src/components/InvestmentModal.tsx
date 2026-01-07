@@ -25,7 +25,8 @@ import {
   Badge,
 } from "@chakra-ui/react";
 import { useState } from "react";
-import { useDappKit } from "@/hooks/useDappKit";
+import { useAccount } from "wagmi";
+import { useEthersSigner } from "@/hooks/useEthersSigner";
 import { propertyContractService } from "@/services/propertyContract";
 
 interface InvestmentModalProps {
@@ -49,7 +50,8 @@ export function InvestmentModal({
   totalShares,
   onSuccess,
 }: InvestmentModalProps) {
-  const { account, isConnected, signAndExecuteTransaction } = useDappKit();
+  const { isConnected, address } = useAccount();
+  const signer = useEthersSigner();
   const toast = useToast();
   const [sharesToBuy, setSharesToBuy] = useState(1);
   const [isInvesting, setIsInvesting] = useState(false);
@@ -60,7 +62,7 @@ export function InvestmentModal({
 
   const handleInvest = async () => {
     // Validation checks
-    if (!isConnected || !account) {
+    if (!isConnected || !address || !signer) {
       toast({
         title: "Wallet Not Connected",
         description: "Please connect your wallet first to continue with the investment.",
@@ -99,12 +101,12 @@ export function InvestmentModal({
 
       setProgress(40);
 
-      // Call smart contract using dapp-kit - REAL BLOCKCHAIN TRANSACTION
-      const result = await propertyContractService.investInProperty(
-        propertyId,
+      // Call smart contract using Ethers service
+      const result = await propertyContractService.invest(
+        parseInt(propertyId),
         sharesToBuy,
-        totalCost,
-        signAndExecuteTransaction
+        pricePerShare.toString(),
+        signer
       );
 
       // Step 3: Processing on blockchain
@@ -116,19 +118,19 @@ export function InvestmentModal({
         setProgress(100);
         setStatusMessage("Investment successful!");
 
-        const txHash = result.transactionDigest;
-        const explorerUrl = `https://onescan.cc/testnet/transactionBlocksDetail?digest=${txHash}`;
-        
+        const txHash = result.transactionHash;
+        const explorerUrl = `https://sepolia.mantlescan.xyz/tx/${txHash}`;
+
         // Show detailed success toast with transaction info
         toast({
           title: "Investment Successful! 🎉",
           description: (
             <VStack align="start" spacing={2} w="full">
-              <Text>You purchased {sharesToBuy} shares for {totalCost} OCT!</Text>
-              <Box 
-                p={2} 
-                bg="gray.100" 
-                borderRadius="md" 
+              <Text>You purchased {sharesToBuy} shares for {totalCost} MNT!</Text>
+              <Box
+                p={2}
+                bg="gray.100"
+                borderRadius="md"
                 w="full"
                 fontSize="xs"
                 fontFamily="mono"
@@ -163,7 +165,7 @@ export function InvestmentModal({
                   colorScheme="green"
                   flex={1}
                 >
-                  🔍 View on OneScan
+                  🔍 View on Explorer
                 </Button>
               </HStack>
             </VStack>
@@ -172,12 +174,12 @@ export function InvestmentModal({
           duration: 15000,
           isClosable: true,
         });
-        
+
         // Call onSuccess callback to refresh property data
         if (onSuccess) {
           onSuccess();
         }
-        
+
         // Reset and close after delay
         setTimeout(() => {
           setSharesToBuy(1);
@@ -191,14 +193,14 @@ export function InvestmentModal({
     } catch (error: any) {
       setProgress(0);
       setStatusMessage("");
-      
+
       // Parse error and show appropriate message
       const errorMessage = error?.message || error?.toString() || 'Unknown error';
-      
+
       // Handle specific error types with user-friendly messages
-      if (errorMessage.includes('User rejected') || 
-          errorMessage.includes('cancelled') ||
-          errorMessage.includes('denied')) {
+      if (errorMessage.includes('User rejected') ||
+        errorMessage.includes('cancelled') ||
+        errorMessage.includes('denied')) {
         toast({
           title: "Transaction Cancelled",
           description: "You cancelled the investment transaction. No funds were transferred.",
@@ -208,13 +210,13 @@ export function InvestmentModal({
       } else if (errorMessage.includes('insufficient') && errorMessage.includes('fund')) {
         toast({
           title: "Insufficient Funds",
-          description: `You need ${totalCost} OCT to complete this investment. Please add funds to your wallet.`,
+          description: `You need ${totalCost} MNT to complete this investment. Please add funds to your wallet.`,
           status: "error",
           duration: 5000,
         });
-      } else if (errorMessage.includes('network') || 
-                 errorMessage.includes('connection') ||
-                 errorMessage.includes('timeout')) {
+      } else if (errorMessage.includes('network') ||
+        errorMessage.includes('connection') ||
+        errorMessage.includes('timeout')) {
         toast({
           title: "Network Error",
           description: "Unable to connect to the blockchain. Please check your connection and try again.",
@@ -235,42 +237,42 @@ export function InvestmentModal({
   };
 
   return (
-    <Modal 
-      isOpen={isOpen} 
-      onClose={onClose} 
-      size="lg" 
+    <Modal
+      isOpen={isOpen}
+      onClose={onClose}
+      size="lg"
       isCentered
       motionPreset="slideInBottom"
     >
-      <ModalOverlay 
-        bg="blackAlpha.800" 
+      <ModalOverlay
+        bg="blackAlpha.800"
         backdropFilter="blur(12px)"
       />
-      <ModalContent 
-        bg="white" 
+      <ModalContent
+        bg="white"
         color="gray.800"
         borderRadius="2xl"
         overflow="hidden"
         boxShadow="0 25px 50px -12px rgba(0, 0, 0, 0.25)"
       >
-        <ModalHeader 
-          borderBottomWidth="1px" 
+        <ModalHeader
+          borderBottomWidth="1px"
           borderColor="gray.100"
           bg="linear-gradient(135deg, rgba(139, 92, 246, 0.05) 0%, rgba(59, 130, 246, 0.05) 100%)"
           py={6}
         >
           <VStack align="start" spacing={2}>
-            <Text 
-              fontSize="2xl" 
-              fontWeight="800" 
+            <Text
+              fontSize="2xl"
+              fontWeight="800"
               color="gray.800"
               letterSpacing="-0.02em"
             >
               Invest in Property
             </Text>
-            <Text 
-              fontSize="lg" 
-              fontWeight="600" 
+            <Text
+              fontSize="lg"
+              fontWeight="600"
               bgGradient="linear(to-r, purple.600, blue.500)"
               bgClip="text"
             >
@@ -278,16 +280,16 @@ export function InvestmentModal({
             </Text>
           </VStack>
         </ModalHeader>
-        <ModalCloseButton 
+        <ModalCloseButton
           size="lg"
-          _hover={{ 
-            bg: "gray.100", 
+          _hover={{
+            bg: "gray.100",
             transform: "rotate(90deg)",
             transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)"
           }}
           transition="all 0.2s"
         />
-        
+
         <ModalBody>
           <VStack spacing={6} align="stretch">
             {isInvesting && (
@@ -299,11 +301,11 @@ export function InvestmentModal({
               </Box>
             )}
 
-            <Box 
-              p={5} 
+            <Box
+              p={5}
               bgGradient="linear(135deg, purple.50 0%, blue.50 100%)"
-              borderRadius="xl" 
-              borderWidth="2px" 
+              borderRadius="xl"
+              borderWidth="2px"
               borderColor="purple.100"
             >
               <VStack spacing={4} align="stretch">
@@ -311,13 +313,13 @@ export function InvestmentModal({
                   <Text fontSize="sm" fontWeight="600" color="gray.600" letterSpacing="wide">
                     PRICE PER SHARE
                   </Text>
-                  <Text 
-                    fontWeight="800" 
-                    fontSize="2xl" 
+                  <Text
+                    fontWeight="800"
+                    fontSize="2xl"
                     bgGradient="linear(to-r, purple.600, blue.500)"
                     bgClip="text"
                   >
-                    {pricePerShare.toLocaleString()} OCT
+                    {pricePerShare.toLocaleString()} MNT
                   </Text>
                 </HStack>
                 <HStack justify="space-between">
@@ -334,9 +336,9 @@ export function InvestmentModal({
             </Box>
 
             <FormControl isRequired>
-              <FormLabel 
-                fontWeight="700" 
-                color="gray.800" 
+              <FormLabel
+                fontWeight="700"
+                color="gray.800"
                 fontSize="md"
                 mb={3}
               >
@@ -350,14 +352,14 @@ export function InvestmentModal({
                 size="lg"
 
               >
-                <NumberInputField 
-                  bg="white" 
+                <NumberInputField
+                  bg="white"
                   borderWidth="2px"
-                  borderColor="gray.200" 
+                  borderColor="gray.200"
                   borderRadius="xl"
                   fontSize="xl"
                   fontWeight="600"
-                  _hover={{ borderColor: "purple.400" }} 
+                  _hover={{ borderColor: "purple.400" }}
                   _focus={{ borderColor: "purple.500", boxShadow: "0 0 0 4px rgba(139, 92, 246, 0.15)" }}
                 />
               </NumberInput>
@@ -382,13 +384,13 @@ export function InvestmentModal({
                 </HStack>
                 <HStack justify="space-between">
                   <Text fontSize="md" fontWeight="medium" color="gray.700">Price per Share:</Text>
-                  <Text fontWeight="bold" fontSize="md" color="gray.900">{pricePerShare.toLocaleString()} OCT</Text>
+                  <Text fontWeight="bold" fontSize="md" color="gray.900">{pricePerShare.toLocaleString()} MNT</Text>
                 </HStack>
                 <Divider borderColor="gray.400" />
                 <HStack justify="space-between">
                   <Text fontWeight="bold" fontSize="xl" color="gray.800">Total Cost:</Text>
                   <Text fontWeight="bold" fontSize="2xl" color="purple.600">
-                    {totalCost.toLocaleString()} OCT
+                    {totalCost.toLocaleString()} MNT
                   </Text>
                 </HStack>
               </VStack>
@@ -398,7 +400,7 @@ export function InvestmentModal({
               <AlertIcon color="blue.500" />
               <VStack align="start" spacing={1}>
                 <Text fontSize="sm" fontWeight="bold" color="gray.800">
-                  Transaction Fee: ~0.05 OCT
+                  Transaction Fee: ~0.05 MNT
                 </Text>
                 <Text fontSize="xs" color="gray.700">
                   You will receive an Investment NFT representing your {sharesToBuy} share{sharesToBuy > 1 ? 's' : ''}
@@ -433,7 +435,7 @@ export function InvestmentModal({
               _hover={{ transform: "translateY(-2px)", shadow: "lg" }}
               transition="all 0.2s"
             >
-              Invest {totalCost.toLocaleString()} OCT
+              Invest {totalCost.toLocaleString()} MNT
             </Button>
           </HStack>
         </ModalFooter>

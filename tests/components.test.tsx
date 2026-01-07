@@ -104,23 +104,23 @@ describe('Form Validation Tests', () => {
 });
 
 describe('Data Transformation Tests', () => {
-  it('should convert MIST to OCT correctly', () => {
-    const mistAmount = 100_000_000; // 1 OCT in MIST (OneChain)
-    const octAmount = mistAmount / 100_000_000;
+  it('should convert MIST to MNT correctly', () => {
+    const mistAmount = 100_000_000; // 1 MNT in MIST (Mantle)
+    const MNTAmount = mistAmount / 100_000_000;
 
-    expect(octAmount).toBe(1);
+    expect(MNTAmount).toBe(1);
   });
 
-  it('should convert OCT to MIST correctly', () => {
-    const octAmount = 10;
-    const mistAmount = octAmount * 100_000_000;
+  it('should convert MNT to MIST correctly', () => {
+    const MNTAmount = 10;
+    const mistAmount = MNTAmount * 100_000_000;
 
     expect(mistAmount).toBe(1_000_000_000);
   });
 
   it('should format large numbers with commas', () => {
     const formatNumber = (num: number) => num.toLocaleString('en-US');
-    
+
     expect(formatNumber(1000000)).toBe('1,000,000');
     expect(formatNumber(5000)).toBe('5,000');
   });

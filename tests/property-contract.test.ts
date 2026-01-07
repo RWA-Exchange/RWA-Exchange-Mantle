@@ -84,7 +84,7 @@ describe('PropertyContractService', () => {
   describe('Investment Logic', () => {
     const mockPropertyId = '0x1234567890abcdef';
     const sharesToBuy = 100;
-    const paymentAmount = 10; // 10 OCT
+    const paymentAmount = 10; // 10 MNT
 
     it('should process investment successfully', async () => {
       const result = await service.investInProperty(
@@ -126,7 +126,7 @@ describe('PropertyContractService', () => {
       expect(mockSignAndExecute).toHaveBeenCalledTimes(1);
     });
 
-    it('should convert OCT to MIST correctly', async () => {
+    it('should convert MNT to MIST correctly', async () => {
       await service.investInProperty(
         mockPropertyId,
         sharesToBuy,
@@ -134,7 +134,7 @@ describe('PropertyContractService', () => {
         mockSignAndExecute
       );
 
-      // Verify the conversion is logged (100M MIST per OCT for OneChain)
+      // Verify the conversion is logged (100M MIST per MNT for Mantle)
       expect(mockSignAndExecute).toHaveBeenCalledTimes(1);
     });
   });
@@ -216,7 +216,7 @@ describe('PropertyContractService', () => {
                 fields: {
                   property_id: '0xproperty1',
                   shares_owned: '100',
-                  investment_amount: '100000000', // 1 OCT in MIST (8 decimals)
+                  investment_amount: '100000000', // 1 MNT in MIST (8 decimals)
                   timestamp: '1234567890',
                 },
               },
@@ -251,7 +251,7 @@ describe('PropertyContractService', () => {
 
       expect(investments).toHaveLength(1);
       expect(investments[0].shares).toBe(100);
-      expect(investments[0].investmentAmount).toBe(1); // Converted from MIST to OCT
+      expect(investments[0].investmentAmount).toBe(1); // Converted from MIST to MNT
     });
 
     it('should handle user with no investments', async () => {

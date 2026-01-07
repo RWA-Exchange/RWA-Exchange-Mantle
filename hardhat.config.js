@@ -1,8 +1,13 @@
-require("@nomicfoundation/hardhat-toolbox");
-require("@nomiclabs/hardhat-etherscan");
-require("dotenv").config();
+require("@nomicfoundation/hardhat-ethers");
+const dotenv = require("dotenv");
 
-/** @type import('hardhat/config').HardhatUserConfig */
+// require("@nomicfoundation/hardhat-toolbox"); // Disabled due to type/module errors
+dotenv.config({ path: ".env.local" });
+dotenv.config(); // fallback
+
+// Use a dummy private key if real one is missing to allow compilation
+const PRIVATE_KEY = process.env.PRIVATE_KEY || "0x0000000000000000000000000000000000000000000000000000000000000000";
+
 module.exports = {
   solidity: {
     version: "0.8.24",
@@ -11,6 +16,7 @@ module.exports = {
         enabled: true,
         runs: 200,
       },
+      viaIR: true, // Required for your "Stack too deep" fix
     },
   },
   networks: {
@@ -21,19 +27,17 @@ module.exports = {
       url: "http://127.0.0.1:8545",
       chainId: 31337,
     },
-    // Mantle Testnet
-    mantle_testnet: {
-      url: process.env.MANTLE_TESTNET_RPC_URL || "https://rpc.sepolia.mantle.xyz",
-      chainId: 5001,
-      accounts: process.env.PRIVATE_KEY ? [process.env.PRIVATE_KEY] : [],
+    "mantle-testnet": {
+      url: "https://rpc.sepolia.mantle.xyz", // Mantle Sepolia RPC
+      accounts: [PRIVATE_KEY],
+      chainId: 5003,
       timeout: 60000,
       gasPrice: 20000000000, // 20 gwei
     },
-    // Mantle Mainnet
-    mantle_mainnet: {
-      url: process.env.MANTLE_MAINNET_RPC_URL || "https://rpc.mantle.xyz",
+    "mantle-mainnet": {
+      url: "https://rpc.mantle.xyz",
+      accounts: [PRIVATE_KEY],
       chainId: 5000,
-      accounts: process.env.PRIVATE_KEY ? [process.env.PRIVATE_KEY] : [],
       timeout: 60000,
       gasPrice: 20000000000, // 20 gwei
     },
@@ -43,33 +47,5 @@ module.exports = {
     tests: "./test",
     cache: "./cache",
     artifacts: "./artifacts"
-  },
-  etherscan: {
-    apiKey: {
-      mantle_testnet: process.env.MANTLE_API_KEY || "your-api-key-here",
-      mantle_mainnet: process.env.MANTLE_API_KEY || "your-api-key-here",
-    },
-    customChains: [
-      {
-        network: "mantle_testnet",
-        chainId: 5001,
-        urls: {
-          apiURL: process.env.MANTLE_TESTNET_EXPLORER_API || "https://explorer.sepolia.mantle.xyz/api",
-          browserURL: process.env.MANTLE_TESTNET_EXPLORER || "https://explorer.sepolia.mantle.xyz"
-        }
-      },
-      {
-        network: "mantle_mainnet",
-        chainId: 5000,
-        urls: {
-          apiURL: process.env.MANTLE_MAINNET_EXPLORER_API || "https://explorer.mantle.xyz/api",
-          browserURL: process.env.MANTLE_MAINNET_EXPLORER || "https://explorer.mantle.xyz"
-        }
-      }
-    ]
-  },
-  gasReporter: {
-    enabled: process.env.REPORT_GAS !== undefined,
-    currency: "USD",
   },
 };

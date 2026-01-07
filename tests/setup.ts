@@ -5,7 +5,7 @@
 
 import { beforeAll, afterAll, beforeEach, afterEach, vi } from 'vitest';
 
-// Mock OneChain RPC for testing
+// Mock Mantle RPC for testing
 export const MOCK_RPC_URL = 'https://mock-rpc-testnet.onelabs.cc:443';
 export const MOCK_PACKAGE_ID = '0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef';
 
@@ -46,7 +46,7 @@ export const MOCK_TRANSACTION_RESPONSE = {
 beforeAll(() => {
   // Set test environment variables
   process.env.NODE_ENV = 'test';
-  process.env.NEXT_PUBLIC_ONECHAIN_RPC_URL = MOCK_RPC_URL;
+  process.env.NEXT_PUBLIC_Mantle_RPC_URL = MOCK_RPC_URL;
   process.env.NEXT_PUBLIC_RWA_PACKAGE_ID = MOCK_PACKAGE_ID;
 });
 
@@ -66,7 +66,7 @@ afterEach(() => {
 // Mock console methods to prevent sensitive data leakage in tests
 export const mockConsole = () => {
   const originalConsole = { ...console };
-  
+
   beforeEach(() => {
     console.log = vi.fn();
     console.error = vi.fn();
@@ -74,7 +74,7 @@ export const mockConsole = () => {
     console.info = vi.fn();
     console.debug = vi.fn();
   });
-  
+
   afterEach(() => {
     Object.assign(console, originalConsole);
   });

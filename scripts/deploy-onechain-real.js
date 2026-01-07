@@ -1,8 +1,8 @@
 #!/usr/bin/env node
 
 /**
- * Real OneChain Deployment Script
- * Deploys the RWA Exchange Move package to OneChain testnet
+ * Real Mantle Deployment Script
+ * Deploys the RWA Exchange Move package to Mantle testnet
  */
 
 const { execSync } = require('child_process');
@@ -10,12 +10,12 @@ const fs = require('fs');
 const path = require('path');
 
 // Configuration
-const ONECHAIN_RPC_URL = process.env.ONECHAIN_TESTNET_RPC_URL || 'https://rpc-testnet.onelabs.cc:443';
-const ONECHAIN_FAUCET_URL = process.env.ONECHAIN_FAUCET_FAUCET_URL || 'https://faucet-testnet.onelabs.cc:443';
+const Mantle_RPC_URL = process.env.Mantle_TESTNET_RPC_URL || 'https://rpc-testnet.onelabs.cc:443';
+const Mantle_FAUCET_URL = process.env.Mantle_FAUCET_FAUCET_URL || 'https://faucet-testnet.onelabs.cc:443';
 
-console.log('🚀 Starting OneChain Real Deployment...\n');
+console.log('🚀 Starting Mantle Real Deployment...\n');
 
-async function deployToOneChain() {
+async function deployToMantle() {
   try {
     // Step 1: Check if Sui CLI is installed
     console.log('📋 Step 1: Checking Sui CLI installation...');
@@ -28,27 +28,27 @@ async function deployToOneChain() {
       process.exit(1);
     }
 
-    // Step 2: Setup OneChain network configuration
-    console.log('📋 Step 2: Configuring OneChain network...');
-    
-    // Create or update Sui client config for OneChain
+    // Step 2: Setup Mantle network configuration
+    console.log('📋 Step 2: Configuring Mantle network...');
+
+    // Create or update Sui client config for Mantle
     const configDir = path.join(process.env.HOME || process.env.USERPROFILE, '.sui', 'sui_config');
-    
-    // Add OneChain testnet to Sui config
+
+    // Add Mantle testnet to Sui config
     try {
-      execSync(`sui client new-env --alias onechain-testnet --rpc ${ONECHAIN_RPC_URL}`, { stdio: 'inherit' });
-      console.log('✅ OneChain testnet environment added');
+      execSync(`sui client new-env --alias Mantle-testnet --rpc ${Mantle_RPC_URL}`, { stdio: 'inherit' });
+      console.log('✅ Mantle testnet environment added');
     } catch (error) {
-      console.log('ℹ️  OneChain testnet environment already exists');
+      console.log('ℹ️  Mantle testnet environment already exists');
     }
 
-    // Switch to OneChain testnet
-    execSync('sui client switch --env onechain-testnet', { stdio: 'inherit' });
-    console.log('✅ Switched to OneChain testnet\n');
+    // Switch to Mantle testnet
+    execSync('sui client switch --env Mantle-testnet', { stdio: 'inherit' });
+    console.log('✅ Switched to Mantle testnet\n');
 
     // Step 3: Check or create wallet
     console.log('📋 Step 3: Setting up wallet...');
-    
+
     let activeAddress;
     try {
       const addressOutput = execSync('sui client active-address', { encoding: 'utf8' });
@@ -63,11 +63,11 @@ async function deployToOneChain() {
     }
 
     // Step 4: Fund wallet from faucet
-    console.log('\n📋 Step 4: Funding wallet from OneChain faucet...');
-    
+    console.log('\n📋 Step 4: Funding wallet from Mantle faucet...');
+
     try {
-      // Request funds from OneChain faucet
-      const faucetResponse = await fetch(`${ONECHAIN_FAUCET_URL}/gas`, {
+      // Request funds from Mantle faucet
+      const faucetResponse = await fetch(`${Mantle_FAUCET_URL}/gas`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -81,11 +81,11 @@ async function deployToOneChain() {
 
       if (faucetResponse.ok) {
         console.log('✅ Faucet request successful');
-        
+
         // Wait a bit for the transaction to be processed
         console.log('⏳ Waiting for faucet transaction to be processed...');
         await new Promise(resolve => setTimeout(resolve, 10000));
-        
+
         // Check balance
         const balanceOutput = execSync('sui client balance', { encoding: 'utf8' });
         console.log('💰 Current balance:');
@@ -99,27 +99,27 @@ async function deployToOneChain() {
 
     // Step 5: Build the Move package
     console.log('\n📋 Step 5: Building Move package...');
-    
+
     // Ensure we're in the project root
     process.chdir(path.dirname(__dirname));
-    
+
     execSync('sui move build', { stdio: 'inherit' });
     console.log('✅ Move package built successfully\n');
 
-    // Step 6: Deploy to OneChain
-    console.log('📋 Step 6: Deploying to OneChain testnet...');
-    
-    const deployOutput = execSync('sui client publish --gas-budget 100000000 --json', { 
+    // Step 6: Deploy to Mantle
+    console.log('📋 Step 6: Deploying to Mantle testnet...');
+
+    const deployOutput = execSync('sui client publish --gas-budget 100000000 --json', {
       encoding: 'utf8',
       stdio: ['inherit', 'pipe', 'inherit']
     });
-    
+
     const deployResult = JSON.parse(deployOutput);
     console.log('✅ Deployment successful!\n');
 
     // Step 7: Extract deployment information
     console.log('📋 Step 7: Processing deployment results...');
-    
+
     const packageId = deployResult.objectChanges?.find(
       change => change.type === 'published'
     )?.packageId;
@@ -129,9 +129,9 @@ async function deployToOneChain() {
     }
 
     const deploymentInfo = {
-      network: 'onechain-testnet',
-      rpcUrl: ONECHAIN_RPC_URL,
-      faucetUrl: ONECHAIN_FAUCET_URL,
+      network: 'Mantle-testnet',
+      rpcUrl: Mantle_RPC_URL,
+      faucetUrl: Mantle_FAUCET_URL,
       packageId: packageId,
       deployerAddress: activeAddress,
       transactionDigest: deployResult.digest,
@@ -142,15 +142,15 @@ async function deployToOneChain() {
 
     // Save deployment info
     fs.writeFileSync(
-      'onechain-deployment-real.json',
+      'Mantle-deployment-real.json',
       JSON.stringify(deploymentInfo, null, 2)
     );
 
-    console.log('✅ Deployment information saved to onechain-deployment-real.json\n');
+    console.log('✅ Deployment information saved to Mantle-deployment-real.json\n');
 
     // Step 8: Update environment variables
     console.log('📋 Step 8: Updating environment configuration...');
-    
+
     // Update .env.local
     let envContent = '';
     if (fs.existsSync('.env.local')) {
@@ -172,7 +172,7 @@ async function deployToOneChain() {
 
     // Step 9: Create sample property
     console.log('📋 Step 9: Creating sample property...');
-    
+
     try {
       const createPropertyOutput = execSync(`sui client call \\
         --package ${packageId} \\
@@ -189,7 +189,7 @@ async function deployToOneChain() {
           500 \\
           "8.5% Annual Yield" \\
         --gas-budget 50000000 \\
-        --json`, { 
+        --json`, {
         encoding: 'utf8',
         stdio: ['inherit', 'pipe', 'inherit']
       });
@@ -202,13 +202,13 @@ async function deployToOneChain() {
       if (propertyId) {
         deploymentInfo.samplePropertyId = propertyId;
         deploymentInfo.samplePropertyTx = createResult.digest;
-        
+
         // Update deployment file
         fs.writeFileSync(
-          'onechain-deployment-real.json',
+          'Mantle-deployment-real.json',
           JSON.stringify(deploymentInfo, null, 2)
         );
-        
+
         console.log(`✅ Sample property created: ${propertyId}\n`);
       }
     } catch (error) {
@@ -219,8 +219,8 @@ async function deployToOneChain() {
     console.log('🎉 DEPLOYMENT COMPLETE!\n');
     console.log('📊 Deployment Summary:');
     console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
-    console.log(`🌐 Network: OneChain Testnet`);
-    console.log(`🔗 RPC URL: ${ONECHAIN_RPC_URL}`);
+    console.log(`🌐 Network: Mantle Testnet`);
+    console.log(`🔗 RPC URL: ${Mantle_RPC_URL}`);
     console.log(`📦 Package ID: ${packageId}`);
     console.log(`👤 Deployer: ${activeAddress}`);
     console.log(`📝 Transaction: ${deployResult.digest}`);
@@ -231,8 +231,8 @@ async function deployToOneChain() {
 
     console.log('🔧 Next Steps:');
     console.log('1. Start your Next.js application: npm run dev');
-    console.log('2. Connect your OneChain wallet');
-    console.log('3. Request OCT tokens from the faucet');
+    console.log('2. Connect your Mantle wallet');
+    console.log('3. Request MNT tokens from the faucet');
     console.log('4. Test property creation and investment features');
     console.log('5. Explore the marketplace with real blockchain data\n');
 
@@ -251,15 +251,15 @@ async function deployToOneChain() {
     console.error('\n🔧 Troubleshooting:');
     console.error('1. Ensure Sui CLI is installed and updated');
     console.error('2. Check your internet connection');
-    console.error('3. Verify OneChain testnet is accessible');
-    console.error('4. Make sure you have sufficient OCT tokens for gas');
+    console.error('3. Verify Mantle testnet is accessible');
+    console.error('4. Make sure you have sufficient MNT tokens for gas');
     process.exit(1);
   }
 }
 
 // Run deployment if called directly
 if (require.main === module) {
-  deployToOneChain().catch(console.error);
+  deployToMantle().catch(console.error);
 }
 
-module.exports = { deployToOneChain };
+module.exports = { deployToMantle };

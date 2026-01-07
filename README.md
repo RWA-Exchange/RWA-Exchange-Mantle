@@ -61,13 +61,13 @@
 - **Investment Tracking**: Real-time portfolio updates with blockchain verification
 - **Share Transfer**: Transfer Investment NFTs to other users
 
-### 💳 **OneChain Wallet Integration**
-- **OneWallet Support**: Native integration with OneChain Wallet via Wallet Standard
+### 💳 **Mantle Wallet Integration**
+- **OneWallet Support**: Native integration with Mantle Wallet via Wallet Standard
 - **Seamless Connection**: One-click wallet connection with account detection
 - **Transaction Signing**: Secure transaction signing with gas fee display
 - **Security First**: All transactions require user approval in wallet popup
 - **Auto-Reconnection**: Maintains wallet connection across page refreshes
-- **Balance Tracking**: Real-time OCT balance display and updates
+- **Balance Tracking**: Real-time MNT balance display and updates
 
 ### 🔍 **Advanced Marketplace**
 - **Smart Search**: Real-time search with filtering by asset type and category
@@ -100,7 +100,7 @@
 #### ✅ **1. Unit Tests for Fractionalization and Trading Logic**
 - **17 comprehensive unit tests** covering all core functionality
 - **Property Creation**: Tests for NFT minting, validation, and error handling
-- **Investment Logic**: Tests for share purchasing, OCT/MIST conversion, and fund validation
+- **Investment Logic**: Tests for share purchasing, MNT/MIST conversion, and fund validation
 - **Trading Operations**: Tests for Investment NFT transfers and ownership verification
 - **Edge Cases**: Tests for invalid inputs, network errors, and boundary conditions
 - **All tests passing**: 100% success rate with proper mocking and blockchain simulation
@@ -138,7 +138,7 @@ logger.investment('Investment successful', {
 if (errorMessage.includes('insufficient funds')) {
   toast({
     title: "Insufficient Funds",
-    description: `You need ${totalCost} OCT to complete this investment.`,
+    description: `You need ${totalCost} MNT to complete this investment.`,
     status: "error"
   });
 }
@@ -180,7 +180,7 @@ The application now meets enterprise-grade standards for:
 
 ## 🏗️ Smart Contracts (Move Language)
 
-This project uses Move smart contracts deployed on OneChain:
+This project uses Move smart contracts deployed on Mantle:
 
 ### **property_nft.move**
 - **PropertyNFT Object**: Represents unique real-world properties as NFTs
@@ -190,20 +190,20 @@ This project uses Move smart contracts deployed on OneChain:
 
 ### **Key Features**
 - **create_property**: Mint a new PropertyNFT with metadata and share configuration
-- **invest**: Buy fractional shares by paying OCT tokens
+- **invest**: Buy fractional shares by paying MNT tokens
 - **transfer_investment**: Transfer Investment NFTs to other users
 - **No separate fractionalization step**: Shares are built into the PropertyNFT structure
 
-## 🔗 OneChain Integration Benefits
+## 🔗 Mantle Integration Benefits
 
-### **Why OneChain for RWA?**
+### **Why Mantle for RWA?**
 - **Optimized for Real-World Assets**: Purpose-built blockchain for tokenizing physical assets
 - **Low Transaction Costs**: Minimal fees for fractionalization and trading operations
 - **Fast Settlement**: Quick confirmation times for asset transactions
 - **Regulatory Compliance**: Built-in compliance features for asset tokenization
 - **Interoperability**: Seamless integration with traditional financial systems
 
-### **OneChain-Specific Features**
+### **Mantle-Specific Features**
 - **🏠 Property Tokenization**: Direct integration with real estate verification systems
 - **🌱 Carbon Credit Trading**: Native support for environmental asset tokenization
 - **⚡ Instant Fractionalization**: Split assets into tradeable fractions in seconds
@@ -213,10 +213,10 @@ This project uses Move smart contracts deployed on OneChain:
 
 ## Tech Stack
 
-- **Blockchain**: OneChain Testnet (Sui-based)
+- **Blockchain**: Mantle Testnet (Sui-based)
 - **Frontend**: Next.js 14, React 18, TypeScript
 - **UI Library**: Chakra UI with custom themes
-- **Web3 SDK**: @mysten/sui for OneChain interactions
+- **Web3 SDK**: @mysten/sui for Mantle interactions
 - **Smart Contracts**: Move language (property_nft.move)
 - **Wallet Integration**: Wallet Standard protocol for OneWallet
 - **State Management**: React hooks and context
@@ -225,12 +225,12 @@ This project uses Move smart contracts deployed on OneChain:
 
 ## Supported Network
 
-### OneChain Testnet
+### Mantle Testnet
 - **RPC URL**: https://rpc-testnet.onelabs.cc:443
-- **Chain Identifier**: `onechain:testnet`
-- **Native Token**: OCT (OneChain Token)
-- **Gas Coin Type**: `0x2::oct::OCT`
-- **Explorer**: https://onescan.cc/testnet/home
+- **Chain Identifier**: `Mantle:testnet`
+- **Native Token**: MNT (Mantle Token)
+- **Gas Coin Type**: `0x2::MNT::MNT`
+- **Explorer**: https://Explorer.cc/testnet/home
 - **Faucet**: https://faucet-testnet.onelabs.cc
 
 ## Move Package Deployment
@@ -258,13 +258,13 @@ The package ID will be displayed in the output after successful deployment.
 flowchart TD
     Start[Start: Real-World Asset] --> Create[1. Create Property NFT]
     
-    Create --> CreateDetails[Property Details:<br/>- Name & Description<br/>- Location & Type<br/>- Total Value<br/>- Total Shares<br/>- Price per Share OCT<br/>- Rental Yield]
+    Create --> CreateDetails[Property Details:<br/>- Name & Description<br/>- Location & Type<br/>- Total Value<br/>- Total Shares<br/>- Price per Share MNT<br/>- Rental Yield]
     
     CreateDetails --> Mint[2. Mint Property NFT]
-    Mint --> MintTx[Transaction on OneChain<br/>PropertyNFT Object Created]
+    Mint --> MintTx[Transaction on Mantle<br/>PropertyNFT Object Created]
     
     MintTx --> Fractional[3. Automatic Fractionalization]
-    Fractional --> FracDetails[Fractional Shares:<br/>- Total Shares: 10,000<br/>- Available: 10,000<br/>- Price: 0.001 OCT/share<br/>- Stored On-Chain]
+    Fractional --> FracDetails[Fractional Shares:<br/>- Total Shares: 10,000<br/>- Available: 10,000<br/>- Price: 0.001 MNT/share<br/>- Stored On-Chain]
     
     FracDetails --> List[4. Auto-Listed in Marketplace]
     List --> ListDetails[Marketplace Listing:<br/>- Visible to all users<br/>- Real-time availability<br/>- Instant investment ready]
@@ -273,7 +273,7 @@ flowchart TD
     Invest --> InvestOptions{Investment Options}
     
     InvestOptions --> BuyShares[Buy Fractional Shares]
-    BuyShares --> ShareDetails[Purchase Details:<br/>- Min: 1 share<br/>- Max: Available shares<br/>- Payment in OCT<br/>- Gas: ~0.05 OCT]
+    BuyShares --> ShareDetails[Purchase Details:<br/>- Min: 1 share<br/>- Max: Available shares<br/>- Payment in MNT<br/>- Gas: ~0.05 MNT]
     
     ShareDetails --> InvestNFT[Investment NFT Created]
     InvestNFT --> InvestRecord[Investment Record:<br/>- Property ID<br/>- Shares Owned<br/>- Investment Amount<br/>- Timestamp]
@@ -307,7 +307,7 @@ flowchart LR
     subgraph Fractionalization[Built-in Fractionalization]
         E --> F[totalShares: 10000]
         F --> G[availableShares: 10000]
-        G --> H[pricePerShare: OCT]
+        G --> H[pricePerShare: MNT]
         H --> I[Stored in PropertyNFT]
     end
     
@@ -344,14 +344,14 @@ flowchart LR
 
 #### 1️⃣ **Property NFT Creation**
 - **Input**: Property details (name, location, value, shares, price)
-- **Output**: Unique PropertyNFT object on OneChain
-- **Gas**: ~0.01 OCT
+- **Output**: Unique PropertyNFT object on Mantle
+- **Gas**: ~0.01 MNT
 - **Time**: ~3-5 seconds
 
 #### 2️⃣ **Automatic Fractionalization**
 - **Built-in**: No separate fractionalization step needed
 - **Shares**: Defined at creation (e.g., 10,000 shares)
-- **Price**: Set in OCT (e.g., 0.001 OCT per share)
+- **Price**: Set in MNT (e.g., 0.001 MNT per share)
 - **Flexible**: Users can buy 1 to all available shares
 
 #### 3️⃣ **Instant Marketplace Listing**
@@ -392,7 +392,7 @@ public entry fun create_property(
 // 2. Invest in Property (Buy Shares)
 public entry fun invest(
     property: &mut PropertyNFT,
-    payment: Coin<OCT>,
+    payment: Coin<MNT>,
     shares_to_buy: u64,
     ctx: &mut TxContext
 )
@@ -443,7 +443,7 @@ one client call \
 
 ---
 
-## OneChain Integration Flow
+## Mantle Integration Flow
 
 ## Dev + User Flow
 
@@ -452,8 +452,8 @@ flowchart TD
   subgraph Dev[Developer Workflow]
     A[Clone Repo] --> B[Install Deps]
     B --> C[Create .env.local\nNEXT_PUBLIC_TW_CLIENT_ID]
-    C --> D{Deploy to OneChain?}
-    D -- Yes --> E[Configure OneChain RPC]
+    C --> D{Deploy to Mantle?}
+    D -- Yes --> E[Configure Mantle RPC]
     E --> F[Deploy RWA Contracts]
     F --> G[Deploy Marketplace]
     D -- No --> H[Use Testnet]
@@ -462,11 +462,11 @@ flowchart TD
     I --> J[Run: npm run dev]
   end
 
-  subgraph User[End-User Flow on OneChain]
-    K[Open App / Landing] --> L[Connect Wallet to OneChain]
-    L --> M{Connected to OneChain?}
+  subgraph User[End-User Flow on Mantle]
+    K[Open App / Landing] --> L[Connect Wallet to Mantle]
+    L --> M{Connected to Mantle?}
     M -- Yes --> N[Browse RWA Marketplace]
-    M -- No --> O[Switch to OneChain Network]
+    M -- No --> O[Switch to Mantle Network]
     O --> N
     N --> P[View Property/Asset Details]
     P --> Q{Investment Action}
@@ -486,15 +486,15 @@ flowchart TD
   J --> K
 ```
 
-## 🚀 Quick Start - OneChain Testnet
+## 🚀 Quick Start - Mantle Testnet
 
 ### Prerequisites
 - **Node.js 18+** and npm installed
-- **OneChain CLI** installed (for Move contract deployment)
-  - Install from: https://docs.onechain.network
+- **Mantle CLI** installed (for Move contract deployment)
+  - Install from: https://docs.Mantle.network
 - **OneWallet** browser extension
-  - Install from OneChain official website
-- **OCT Tokens** for gas fees
+  - Install from Mantle official website
+- **MNT Tokens** for gas fees
   - Get from faucet: https://faucet-testnet.onelabs.cc
 
 ### Deploy and Run in 5 Minutes
@@ -514,9 +514,9 @@ cp .env.example .env.local
 
 Required environment variables:
 ```env
-# OneChain Configuration
-NEXT_PUBLIC_ONECHAIN_RPC_URL=https://rpc-testnet.onelabs.cc:443
-NEXT_PUBLIC_ONECHAIN_NETWORK=testnet
+# Mantle Configuration
+NEXT_PUBLIC_Mantle_RPC_URL=https://rpc-testnet.onelabs.cc:443
+NEXT_PUBLIC_Mantle_NETWORK=testnet
 NEXT_PUBLIC_RWA_PACKAGE_ID=YOUR_PACKAGE_ID
 
 # Pinata IPFS (for image uploads)
@@ -531,7 +531,7 @@ NEXT_PUBLIC_PINATA_GATEWAY=your_pinata_gateway_url
 # Build Move package
 one move build
 
-# Deploy to OneChain testnet
+# Deploy to Mantle testnet
 one client publish --gas-budget 100000000
 
 # Save the Package ID from output
@@ -568,10 +568,10 @@ npm run dev
 Open [http://localhost:3000](http://localhost:3000) to view the marketplace.
 
 ### Verify Deployment
-- **Package Explorer**: https://onescan.cc/testnet/object/YOUR_PACKAGE_ID
+- **Package Explorer**: https://Explorer.cc/testnet/object/YOUR_PACKAGE_ID
 - **Check Objects**: `one client objects`
 - **View Transaction**: `one client tx-block [TX_HASH]`
-- **OneScan Explorer**: https://onescan.cc/testnet/home
+- **Explorer Explorer**: https://Explorer.cc/testnet/home
 
 ---
 
@@ -582,14 +582,14 @@ Open [http://localhost:3000](http://localhost:3000) to view the marketplace.
 #### Production Status
 - ✅ **Phase 2 Complete**: All security requirements met with comprehensive testing
 - ✅ **Production Ready**: Secure logging, input validation, and error handling implemented
-- ⚠️ **Testnet Only**: Currently deployed on OneChain testnet for demonstration
+- ⚠️ **Testnet Only**: Currently deployed on Mantle testnet for demonstration
 - ⚠️ **Demo Purpose**: Hackathon/demo project - professional audit recommended for mainnet
 
 #### Technical Limitations
 - **OneWallet Only**: Currently only supports OneWallet browser extension
 - **Manual Gas Selection**: Gas coins must be manually selected for transactions
 - **Transaction Confirmation**: May take 5-10 seconds for finality on testnet
-- **RPC Timeouts**: OneChain testnet RPC may occasionally timeout, retry if needed
+- **RPC Timeouts**: Mantle testnet RPC may occasionally timeout, retry if needed
 
 #### Feature Gaps
 - **Dividend Distribution**: Manual process, not automated
@@ -612,7 +612,7 @@ Open [http://localhost:3000](http://localhost:3000) to view the marketplace.
 - Share price is fixed at creation (no dynamic pricing)
 
 #### Network
-- OneChain testnet may have occasional downtime
+- Mantle testnet may have occasional downtime
 - Gas estimation may be inaccurate
 - Event indexing may lag behind transactions
 
@@ -637,7 +637,7 @@ Open [http://localhost:3000](http://localhost:3000) to view the marketplace.
 
 1. **Wallet Security**: Always verify transaction details in OneWallet before signing
 2. **Test Environment**: Currently on testnet - use only test tokens
-3. **Gas Fees**: Always ensure you have sufficient OCT for gas fees (~0.05 OCT per transaction)
+3. **Gas Fees**: Always ensure you have sufficient MNT for gas fees (~0.05 MNT per transaction)
 4. **Professional Audit**: Recommended before mainnet deployment for production use
 
 ### Recommended Use Cases
@@ -681,8 +681,8 @@ Open [http://localhost:3000](http://localhost:3000) to view the marketplace.
 
 If you encounter issues:
 1. Check the [Troubleshooting](#troubleshooting) section below
-2. Visit OneChain documentation: https://docs.onechain.network
-3. Check OneChain faucet for OCT tokens: https://faucet-testnet.onelabs.cc
+2. Visit Mantle documentation: https://docs.Mantle.network
+3. Check Mantle faucet for MNT tokens: https://faucet-testnet.onelabs.cc
 4. Open an issue on GitHub
 
 ---
@@ -703,7 +703,7 @@ During development, we encountered a critical issue where the OneWallet Sign but
 // 1. Manually fetch and set gas payment coins
 const gasCoins = await client.getCoins({
   owner: address,
-  coinType: '0x2::oct::OCT'
+  coinType: '0x2::MNT::MNT'
 });
 
 transaction.setGasPayment(gasCoins.data.map(coin => ({
@@ -722,7 +722,7 @@ await transaction.build({ client });
 await wallet.signAndExecuteTransaction({
   transaction: transaction,  // Has toJSON() method
   account: connectedAccount,
-  chain: 'onechain:testnet'
+  chain: 'Mantle:testnet'
 });
 ```
 
@@ -730,7 +730,7 @@ await wallet.signAndExecuteTransaction({
 - OneWallet requires the **Transaction object** (not bytes) because it needs the `toJSON()` method
 - Gas data must be **populated before** passing to wallet (via `build()`)
 - Gas owner must be **explicitly set** to match the sender address
-- Chain identifier must be `'onechain:testnet'` (not `'sui:testnet'`)
+- Chain identifier must be `'Mantle:testnet'` (not `'sui:testnet'`)
 
 This implementation ensures the wallet can properly display transaction details and calculate network fees.
 
@@ -742,7 +742,7 @@ This implementation ensures the wallet can properly display transaction details 
 ## Project Structure
 
 - `sources/` — Move smart contracts (`property_nft.move`).
-- `scripts/` — Deployment scripts for OneChain.
+- `scripts/` — Deployment scripts for Mantle.
 - `tests/` — Comprehensive test suite (Phase 2 complete).
   - `tests/property-contract.test.ts` — Unit tests for fractionalization and trading logic
   - `tests/components.test.tsx` — Component integration tests
@@ -751,7 +751,7 @@ This implementation ensures the wallet can properly display transaction details 
 - `src/` — Next.js app and components.
   - `src/app/` — Next.js routes (e.g., `collection/`, `create-property/`, `my-investments/`, `dashboard/`).
   - `src/components/` — UI components (e.g., `PropertyCreationForm.tsx`, `InvestmentModal.tsx`).
-  - `src/services/` — Blockchain services (e.g., `propertyContract.ts`, `onechain.ts`).
+  - `src/services/` — Blockchain services (e.g., `propertyContract.ts`, `Mantle.ts`).
   - `src/utils/` — Utility functions including `secureLogger.ts` for production-safe logging.
   - `src/hooks/` — Custom React hooks for wallet and blockchain integration.
   - `src/consts/` — Configuration constants.
@@ -774,12 +774,12 @@ npm run test         # run individual test files
 npm run test:coverage # generate test coverage report
 ```
 
-OneChain CLI (Move contract deployment):
+Mantle CLI (Move contract deployment):
 
 ```bash
 one move build                    # compile Move contracts
 one move test                     # test Move contracts
-one client publish --gas-budget 100000000  # deploy to OneChain
+one client publish --gas-budget 100000000  # deploy to Mantle
 one client call --package <PKG_ID> --module property_nft --function create_property  # interact with contracts
 ```
 
@@ -800,7 +800,7 @@ Overall Status: ✅ ALL TESTS PASSED
 
 ### Test Coverage
 - **Property Creation & Fractionalization**: 4 tests
-- **Investment Logic**: 4 tests covering OCT/MIST conversion, share validation
+- **Investment Logic**: 4 tests covering MNT/MIST conversion, share validation
 - **Trading Operations**: 2 tests for share transfers
 - **Property Fetching**: 3 tests for blockchain data retrieval
 - **User Investments**: 2 tests for portfolio tracking
@@ -831,9 +831,9 @@ npm run test:coverage
 Create `.env.local` at repo root:
 
 ```env
-# OneChain Configuration
-NEXT_PUBLIC_ONECHAIN_RPC_URL=https://rpc-testnet.onelabs.cc:443
-NEXT_PUBLIC_ONECHAIN_NETWORK=testnet
+# Mantle Configuration
+NEXT_PUBLIC_Mantle_RPC_URL=https://rpc-testnet.onelabs.cc:443
+NEXT_PUBLIC_Mantle_NETWORK=testnet
 NEXT_PUBLIC_RWA_PACKAGE_ID=YOUR_PACKAGE_ID
 ```
 
@@ -841,9 +841,9 @@ NEXT_PUBLIC_RWA_PACKAGE_ID=YOUR_PACKAGE_ID
 
 1) Install dependencies: `npm install`
 
-2) Configure environment: create `.env.local` with OneChain configuration.
+2) Configure environment: create `.env.local` with Mantle configuration.
 
-3) (Optional) Develop/compile/deploy Move contracts with OneChain CLI:
+3) (Optional) Develop/compile/deploy Move contracts with Mantle CLI:
    ```bash
    one move build
    one client publish --gas-budget 100000000
@@ -853,7 +853,7 @@ NEXT_PUBLIC_RWA_PACKAGE_ID=YOUR_PACKAGE_ID
 
 5) Run the app: `npm run dev` and open http://localhost:3000
 
-6) Connect wallet (OneChain Wallet via navbar) and interact with the marketplace.
+6) Connect wallet (Mantle Wallet via navbar) and interact with the marketplace.
 
 
 ## Troubleshooting
@@ -861,34 +861,34 @@ NEXT_PUBLIC_RWA_PACKAGE_ID=YOUR_PACKAGE_ID
 ### Common Issues
 
 #### Wallet Connection Issues
-- **OneChain Wallet**: Install OneChain Wallet extension from the official website
-- **Wallet Standard**: The app uses Wallet Standard interface for OneChain integration
+- **Mantle Wallet**: Install Mantle Wallet extension from the official website
+- **Wallet Standard**: The app uses Wallet Standard interface for Mantle integration
 - **Connection Fails**: Try refreshing the page and reconnecting
-- **No Wallet Detected**: Ensure OneChain Wallet extension is installed and unlocked
-- **Wrong Network**: Make sure you're connected to OneChain Testnet
+- **No Wallet Detected**: Ensure Mantle Wallet extension is installed and unlocked
+- **Wrong Network**: Make sure you're connected to Mantle Testnet
 
-#### OneChain-Specific Issues
-- **RPC Connection**: If OneChain RPC is slow, check your network configuration at `https://rpc-testnet.onelabs.cc:443`
-- **Contract Interactions**: Ensure you have sufficient **OCT tokens** for gas fees (not ONE)
-- **Transaction Fails**: Check transaction on OneScan: `https://onescan.cc/testnet/home`
-- **Property Not Loading**: Verify the property exists on OneChain testnet
-- **Investment Fails**: Ensure you have enough OCT for both the investment amount and gas fees
+#### Mantle-Specific Issues
+- **RPC Connection**: If Mantle RPC is slow, check your network configuration at `https://rpc-testnet.onelabs.cc:443`
+- **Contract Interactions**: Ensure you have sufficient **MNT tokens** for gas fees (not ONE)
+- **Transaction Fails**: Check transaction on Explorer: `https://Explorer.cc/testnet/home`
+- **Property Not Loading**: Verify the property exists on Mantle testnet
+- **Investment Fails**: Ensure you have enough MNT for both the investment amount and gas fees
 
 #### Build/Runtime Errors
 - **Module not found errors**: Run `npm install` to ensure all dependencies are installed
-- **Environment variable errors**: Ensure `.env.local` exists with valid OneChain configuration
+- **Environment variable errors**: Ensure `.env.local` exists with valid Mantle configuration
 - **Next.js fails to start**: Clear `.next/` folder and retry: `rm -rf .next && npm run dev` (Windows: delete `.next` folder manually)
 - **TypeScript errors**: Run `npm run build` to check for type errors before deploying
 
 #### Performance Issues
 - **Slow loading**: The app fetches real blockchain data which may take time
-- **Network timeouts**: OneChain testnet may have occasional delays
-- **Low gas fees**: OneChain offers significantly lower fees compared to Ethereum mainnet (~0.01-0.05 OCT per transaction)
-- **Development**: Always use OneChain testnet for development and testing
+- **Network timeouts**: Mantle testnet may have occasional delays
+- **Low gas fees**: Mantle offers significantly lower fees compared to Ethereum mainnet (~0.01-0.05 MNT per transaction)
+- **Development**: Always use Mantle testnet for development and testing
 
 ### Getting Help
-- Check the [OneChain documentation](https://docs.onechain.network)
-- Visit [OneScan Explorer](https://onescan.cc/testnet/home) to verify transactions
+- Check the [Mantle documentation](https://docs.Mantle.network)
+- Visit [Explorer Explorer](https://Explorer.cc/testnet/home) to verify transactions
 - Review contract addresses in `.env.local` if using custom deployments
 - Open an issue on GitHub for project-specific problems
 

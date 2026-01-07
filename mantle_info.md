@@ -17,6 +17,7 @@ Testnet (Mantle Sepolia Testnet): 5001.
 Native Token
 
 Mainnet: MNT (Mantle Token) – used for gas fees, governance, staking, and ecosystem incentives. It's an ERC-20 token with utilities like paying for transactions and participating in Mantle EcoFund.
+
 Testnet: MNT (updated from earlier BIT token; modern guides and ChainList confirm MNT as the native currency symbol for testing). Note: Older docs (pre-2024) may refer to BIT, but as of 2025+, it's standardized to MNT for consistency with mainnet.
 
 

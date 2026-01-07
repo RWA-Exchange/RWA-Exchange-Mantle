@@ -7,18 +7,20 @@ import {
   ModalHeader,
   ModalBody,
   ModalFooter,
-  Button,
   VStack,
   Text,
   Icon,
   useDisclosure,
   useToast,
   Box,
+  Flex,
 } from "@chakra-ui/react";
-import { useMantleWallet } from "@/hooks/useOneChainWallet";
-import { useEffect, ReactNode, useState } from "react";
-import { FiAlertCircle, FiWifi, FiWifiOff } from "react-icons/fi";
+import { useAccount } from "wagmi";
+import { useEffect } from "react";
+import { FiWifi, FiWifiOff } from "react-icons/fi";
 import { useRouter } from "next/navigation";
+import { ConnectButton } from "@rainbow-me/rainbowkit";
+import { ReactNode } from "react";
 
 interface WalletGuardProps {
   children: ReactNode;
@@ -26,11 +28,10 @@ interface WalletGuardProps {
 }
 
 export function WalletGuard({ children, requireWallet = false }: WalletGuardProps) {
-  const { isConnected, connect, switchToMantle } = useMantleWallet();
+  const { isConnected } = useAccount();
   const { isOpen, onOpen, onClose } = useDisclosure();
   const router = useRouter();
   const toast = useToast();
-  const [isConnecting, setIsConnecting] = useState(false);
 
   useEffect(() => {
     if (requireWallet && !isConnected) {
@@ -46,64 +47,6 @@ export function WalletGuard({ children, requireWallet = false }: WalletGuardProp
       onClose();
     }
   }, [requireWallet, isConnected, onOpen, isOpen, onClose, toast]);
-
-  const handleConnectWallet = async () => {
-    setIsConnecting(true);
-    
-    try {
-      connect(); // RainbowKit handles the connection flow
-      // Success will be handled by useEffect when isConnected changes
-    } catch (error: any) {
-      const errorMessage = error?.message || 'Unknown error';
-      
-      if (errorMessage.includes('rejected') || 
-          errorMessage.includes('cancelled') ||
-          errorMessage.includes('denied')) {
-        toast({
-          title: "Connection Cancelled",
-          description: "Wallet connection was cancelled. Please try again.",
-          status: "warning",
-          duration: 4000,
-        });
-      } else if (errorMessage.includes('not found') || 
-                 errorMessage.includes('not installed')) {
-        toast({
-          title: "Wallet Not Found",
-          description: "Please install MetaMask or another compatible wallet",
-          status: "error",
-          duration: 5000,
-        });
-      } else {
-        toast({
-          title: "Connection Failed",
-          description: "Unable to connect to wallet. Please try again.",
-          status: "error",
-          duration: 4000,
-        });
-      }
-    } finally {
-      setIsConnecting(false);
-    }
-  };
-
-  const handleSwitchToMantle = async () => {
-    try {
-      await switchToMantle();
-      toast({
-        title: "Network Switched",
-        description: "Successfully switched to Mantle Network",
-        status: "success",
-        duration: 3000,
-      });
-    } catch (error) {
-      toast({
-        title: "Network Switch Failed",
-        description: "Failed to switch to Mantle Network. Please switch manually.",
-        status: "error",
-        duration: 4000,
-      });
-    }
-  };
 
   if (!requireWallet) {
     return <>{children}</>;
@@ -170,7 +113,7 @@ export function WalletGuard({ children, requireWallet = false }: WalletGuardProp
                   backdropFilter="blur(10px)"
                   boxShadow="0 8px 32px rgba(0, 0, 0, 0.2)"
                 >
-                  <Icon as={isConnecting ? FiWifi : FiWifiOff} boxSize={12} color="white" />
+                  <Icon as={FiWifiOff} boxSize={12} color="white" />
                 </Box>
                 <Text
                   fontSize="2xl"
@@ -179,7 +122,7 @@ export function WalletGuard({ children, requireWallet = false }: WalletGuardProp
                   letterSpacing="tight"
                   fontFamily="Outfit"
                 >
-                  {isConnecting ? "Connecting..." : "Wallet Connection Required"}
+                  Wallet Connection Required
                 </Text>
               </VStack>
             </ModalHeader>
@@ -198,69 +141,9 @@ export function WalletGuard({ children, requireWallet = false }: WalletGuardProp
 
           <ModalFooter bg="gray.50" _dark={{ bg: "gray.900" }} py={6} px={8}>
             <VStack spacing={3} width="full">
-              <Button
-                width="full"
-                h="56px"
-                fontSize="lg"
-                fontWeight="700"
-                borderRadius="xl"
-                bgGradient="linear(to-r, purple.600, blue.600)"
-                color="white"
-                fontFamily="Outfit"
-                onClick={handleConnectWallet}
-                isLoading={isConnecting}
-                loadingText="Connecting..."
-                _hover={{
-                  bgGradient: "linear(to-r, purple.500, blue.500)",
-                  transform: "translateY(-2px)",
-                  boxShadow: "0 12px 40px rgba(102, 126, 234, 0.4)",
-                }}
-                _active={{
-                  transform: "translateY(0)",
-                }}
-                transition="all 0.3s cubic-bezier(0.4, 0, 0.2, 1)"
-              >
-                Connect Wallet
-              </Button>
-              <Button
-                variant="outline"
-                width="full"
-                h="48px"
-                fontSize="md"
-                fontWeight="600"
-                fontFamily="Outfit"
-                color="green.600"
-                borderColor="green.600"
-                onClick={handleSwitchToMantle}
-                isDisabled={isConnecting}
-                _hover={{
-                  bg: "green.50",
-                  borderColor: "green.700",
-                  color: "green.700",
-                }}
-                transition="all 0.2s"
-              >
-                Add Mantle Network
-              </Button>
-              <Button
-                variant="ghost"
-                width="full"
-                h="48px"
-                fontSize="md"
-                fontWeight="600"
-                fontFamily="Outfit"
-                color="gray.600"
-                _dark={{ color: "gray.400" }}
-                onClick={() => router.back()}
-                isDisabled={isConnecting}
-                _hover={{
-                  bg: "gray.100",
-                  color: "gray.800",
-                }}
-                transition="all 0.2s"
-              >
-                Go Back
-              </Button>
+              <Flex justify="center" width="full">
+                <ConnectButton />
+              </Flex>
             </VStack>
           </ModalFooter>
         </ModalContent>

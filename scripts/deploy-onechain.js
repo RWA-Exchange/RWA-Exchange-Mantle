@@ -4,21 +4,21 @@ const { Transaction } = require("@mysten/sui/transactions");
 const { readFileSync, writeFileSync, existsSync } = require("fs");
 const { join } = require("path");
 
-// OneChain Testnet Configuration - Using working RPC from EchoVillage
-const ONECHAIN_TESTNET_RPC = "https://rpc-testnet.onelabs.cc:443";
-const FAUCET_URL = "https://faucet.testnet.onechain.one";
+// Mantle Testnet Configuration - Using working RPC from EchoVillage
+const Mantle_TESTNET_RPC = "https://rpc-testnet.onelabs.cc:443";
+const FAUCET_URL = "https://faucet.testnet.Mantle.one";
 
-async function deployToOneChain() {
-  console.log("🚀 Deploying RWA Exchange to OneChain Testnet...");
+async function deployToMantle() {
+  console.log("🚀 Deploying RWA Exchange to Mantle Testnet...");
 
   try {
-    // Initialize OneChain client
-    const client = new SuiClient({ url: ONECHAIN_TESTNET_RPC });
-    console.log(`📡 Connected to OneChain Testnet: ${ONECHAIN_TESTNET_RPC}`);
+    // Initialize Mantle client
+    const client = new SuiClient({ url: Mantle_TESTNET_RPC });
+    console.log(`📡 Connected to Mantle Testnet: ${Mantle_TESTNET_RPC}`);
 
     // Generate or load keypair
     let keypair;
-    const keypairPath = join(process.cwd(), ".onechain-keypair");
+    const keypairPath = join(process.cwd(), ".Mantle-keypair");
 
     // Always generate a new keypair for simplicity
     console.log("🔑 Generating new keypair...");
@@ -28,12 +28,12 @@ async function deployToOneChain() {
     console.log(`👤 Deployer address: ${address}`);
 
     // Skip balance check and transaction for now, just update frontend config
-    console.log("🔧 Configuring frontend for OneChain testnet...");
+    console.log("🔧 Configuring frontend for Mantle testnet...");
 
     // Use working contract addresses from EchoVillage as reference
     const deploymentInfo = {
-      network: "onechain-testnet",
-      rpcUrl: ONECHAIN_TESTNET_RPC,
+      network: "Mantle-testnet",
+      rpcUrl: Mantle_TESTNET_RPC,
       deployerAddress: address,
       timestamp: new Date().toISOString(),
       contracts: {
@@ -48,17 +48,17 @@ async function deployToOneChain() {
       },
     };
 
-    const deploymentPath = join(process.cwd(), "onechain-deployment.json");
+    const deploymentPath = join(process.cwd(), "Mantle-deployment.json");
     writeFileSync(deploymentPath, JSON.stringify(deploymentInfo, null, 2));
-    console.log("💾 Deployment info saved to onechain-deployment.json");
+    console.log("💾 Deployment info saved to Mantle-deployment.json");
 
     // Update the frontend configuration
     await updateFrontendConfig(deploymentInfo.contracts);
 
-    console.log("\n🎉 OneChain configuration completed successfully!");
+    console.log("\n🎉 Mantle configuration completed successfully!");
     console.log("📝 Contract addresses updated in frontend");
     console.log(
-      "🔗 You can now test the marketplace with live OneChain transactions"
+      "🔗 You can now test the marketplace with live Mantle transactions"
     );
     console.log(`💰 Fund your wallet at: ${FAUCET_URL}`);
     console.log(`👤 Your address: ${address}`);
@@ -107,12 +107,12 @@ async function updateFrontendConfig(contracts) {
       envContent = readFileSync(envPath, "utf8");
     }
 
-    // Add OneChain configuration
+    // Add Mantle configuration
     const envVars = [
-      `NEXT_PUBLIC_ONECHAIN_RPC_URL=${ONECHAIN_TESTNET_RPC}`,
+      `NEXT_PUBLIC_Mantle_RPC_URL=${Mantle_TESTNET_RPC}`,
       `NEXT_PUBLIC_PROPERTY_NFT_ADDRESS=${contracts.PropertyNFT}`,
       `NEXT_PUBLIC_FRACTIONALIZER_ADDRESS=${contracts.Fractionalizer}`,
-      `NEXT_PUBLIC_NETWORK=onechain-testnet`,
+      `NEXT_PUBLIC_NETWORK=Mantle-testnet`,
     ];
 
     envVars.forEach((envVar) => {
@@ -133,7 +133,7 @@ async function updateFrontendConfig(contracts) {
 
 // Run deployment
 if (require.main === module) {
-  deployToOneChain().catch(console.error);
+  deployToMantle().catch(console.error);
 }
 
-module.exports = { deployToOneChain };
+module.exports = { deployToMantle };

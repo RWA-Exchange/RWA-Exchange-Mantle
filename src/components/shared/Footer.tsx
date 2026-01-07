@@ -41,7 +41,7 @@ export function Footer() {
                         <HStack spacing={2}>
                             <Image
                                 src="/logo.png"
-                                alt="OneRWA Logo"
+                                alt="MantleRWA Logo"
                                 height="36px"
                                 width="auto"
                             />
@@ -52,12 +52,12 @@ export function Footer() {
                                 fontFamily="Outfit"
                                 fontWeight="900"
                             >
-                                OneRWA
+                                MantleRWA
                             </Heading>
                         </HStack>
                         <Text fontSize="sm" color={textColor} lineHeight="1.8" maxW="300px">
                             The next-generation platform for tokenizing and trading real-world assets
-                            with institutional-grade security on OneChain.
+                            with institutional-grade security on Mantle.
                         </Text>
                         {/* Social Icons */}
                         <HStack spacing={3} pt={2}>
@@ -235,7 +235,7 @@ export function Footer() {
                     gap={4}
                 >
                     <Text fontSize="sm" color={textColor} textAlign={{ base: "center", md: "left" }}>
-                        © {new Date().getFullYear()} OneRWA. All rights reserved. Built on OneChain.
+                        © {new Date().getFullYear()} MantleRWA. All rights reserved. Built on Mantle.
                     </Text>
                     <HStack spacing={6} flexWrap="wrap" justify={{ base: "center", md: "flex-end" }}>
                         {[

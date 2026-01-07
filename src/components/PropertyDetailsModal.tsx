@@ -25,11 +25,11 @@ import {
   StatHelpText,
   Progress,
 } from "@chakra-ui/react";
-import { 
-  FaMapMarkerAlt, 
-  FaHome, 
-  FaCoins, 
-  FaChartLine, 
+import {
+  FaMapMarkerAlt,
+  FaHome,
+  FaCoins,
+  FaChartLine,
   FaCalendarAlt,
   FaUser,
   FaShieldAlt
@@ -156,7 +156,7 @@ export function PropertyDetailsModal({
                   PRICE/SHARE
                 </StatLabel>
                 <StatNumber fontSize="lg" fontWeight="900" color="blue.600">
-                  {property.pricePerShare} OCT
+                  {property.pricePerShare} MNT
                 </StatNumber>
               </Stat>
 
@@ -231,7 +231,7 @@ export function PropertyDetailsModal({
                   <HStack>
                     <Icon as={FaCoins} color="purple.500" />
                     <Text fontSize="sm" fontWeight="600">Minimum Investment:</Text>
-                    <Text fontSize="sm" color={textColor}>{property.pricePerShare} OCT (1 share)</Text>
+                    <Text fontSize="sm" color={textColor}>{property.pricePerShare} MNT (1 share)</Text>
                   </HStack>
                   <HStack>
                     <Icon as={FaChartLine} color="green.500" />

@@ -23,18 +23,15 @@ import {
 import { useRef } from "react";
 import { FaRegMoon } from "react-icons/fa";
 import { IoSunny } from "react-icons/io5";
-import { useOneChainWallet } from "@/hooks/useOneChainWallet";
-import { OneChainWalletButton } from "./OneChainWallet";
+import { ConnectButton } from "@rainbow-me/rainbowkit";
+import { useAccount, useDisconnect } from "wagmi";
 
 export function SideMenu() {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const btnRef = useRef<HTMLButtonElement>(null);
   const { colorMode, toggleColorMode } = useColorMode();
-  const { 
-    isConnected, 
-    account, 
-    disconnect 
-  } = useOneChainWallet();
+  const { isConnected, address } = useAccount();
+  const { disconnect } = useDisconnect();
 
   return (
     <>
@@ -57,17 +54,17 @@ export function SideMenu() {
           <DrawerBody>
             <VStack spacing={4} align="stretch">
               <Box>
-                <OneChainWalletButton />
+                <ConnectButton />
               </Box>
 
-              {isConnected && account && (
+              {isConnected && address && (
                 <>
                   <Divider />
                   <VStack spacing={2} align="stretch">
                     <Text fontSize="sm" fontWeight="bold" color="gray.600">
-                      OneChain Network
+                      Mantle Network
                     </Text>
-                    
+
                     <HStack justify="space-between">
                       <Text fontSize="sm">Status:</Text>
                       <Badge colorScheme="green" variant="solid">
@@ -78,33 +75,33 @@ export function SideMenu() {
                     <HStack justify="space-between">
                       <Text fontSize="sm">Network:</Text>
                       <Badge colorScheme="blue" variant="solid">
-                        Sui Testnet
+                        Mantle Sepolia
                       </Badge>
                     </HStack>
                   </VStack>
                   <Divider />
                 </>
               )}
-              
+
               <Link href="/landing" _hover={{ textDecoration: "none" }} onClick={onClose}>
                 <Button variant="ghost" w="full" justifyContent="flex-start">
                   About
                 </Button>
               </Link>
-              
+
               <Link href="/dashboard" _hover={{ textDecoration: "none" }} onClick={onClose}>
                 <Button variant="ghost" w="full" justifyContent="flex-start">
                   Dashboard
                 </Button>
               </Link>
-              
+
               <Link href="/collection" _hover={{ textDecoration: "none" }} onClick={onClose}>
                 <Button variant="ghost" w="full" justifyContent="flex-start">
                   Marketplace
                 </Button>
               </Link>
-              
-              {isConnected && account && (
+
+              {isConnected && address && (
                 <Link href="/profile" _hover={{ textDecoration: "none" }} onClick={onClose}>
                   <Button variant="ghost" w="full" justifyContent="flex-start">
                     Profile

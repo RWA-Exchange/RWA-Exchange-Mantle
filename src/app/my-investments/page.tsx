@@ -31,9 +31,9 @@ import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { WalletGuard } from "@/components/WalletGuard";
 import { TransferSharesModal } from "@/components/TransferSharesModal";
-import { 
-  FaExchangeAlt, 
-  FaChartLine, 
+import {
+  FaExchangeAlt,
+  FaChartLine,
   FaCoins,
   FaWallet,
   FaShareAlt,
@@ -42,7 +42,7 @@ import {
   FaCalendarAlt,
 } from "react-icons/fa";
 import { FiTrendingUp } from "react-icons/fi";
-import { useDappKit } from "@/hooks/useDappKit";
+import { useAccount } from "wagmi";
 import { propertyContractService } from "@/services/propertyContract";
 import { logger } from "@/utils/secureLogger";
 
@@ -56,7 +56,7 @@ export default function MyInvestmentsPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [walletBalance, setWalletBalance] = useState<number>(0);
-  const { account } = useDappKit();
+  const { address } = useAccount();
   const toast = useToast();
 
   const gradient = useColorModeValue(
@@ -67,7 +67,7 @@ export default function MyInvestmentsPage() {
 
   // Fetch real investments from blockchain
   const fetchInvestments = async (showRefreshToast = false) => {
-    if (!account?.address) {
+    if (!address) {
       setIsLoading(false);
       return;
     }
@@ -76,14 +76,15 @@ export default function MyInvestmentsPage() {
     else setIsLoading(true);
 
     try {
-      logger.investment('Fetching user investments', { userAddress: account.address });
-      const userInvestments = await propertyContractService.getUserInvestments(account.address);
-      logger.investment('Successfully fetched investments', { count: userInvestments.length });
-      
-      // Use secure logging to avoid exposing sensitive data
-      
+      console.log('Fetching user investments for:', address);
+
+      const { propertyContractService } = await import('@/services/propertyContract');
+      const userInvestments = await propertyContractService.getUserInvestments(address);
+
+      console.log('Successfully fetched investments:', userInvestments);
+
       setInvestments(userInvestments);
-      
+
       if (showRefreshToast) {
         toast({
           title: "Portfolio Updated! 📊",
@@ -93,9 +94,9 @@ export default function MyInvestmentsPage() {
         });
       }
     } catch (error) {
-      logger.error('Error fetching user investments', error);
+      console.error('Error fetching user investments:', error);
       setInvestments([]);
-      
+
       if (showRefreshToast) {
         toast({
           title: "Update Failed",
@@ -112,29 +113,29 @@ export default function MyInvestmentsPage() {
 
   useEffect(() => {
     fetchInvestments();
-  }, [account?.address]);
+  }, [address]);
 
   // Calculate portfolio metrics with proper data validation
   const totalInvested = investments.reduce((sum, inv) => {
     const amount = Number(inv.investmentAmount) || 0;
     return sum + amount;
   }, 0);
-  
+
   const totalShares = investments.reduce((sum, inv) => {
     const shares = Number(inv.shares) || 0;
     return sum + shares;
   }, 0);
-  
+
   const uniqueProperties = new Set(investments.map(inv => inv.propertyId)).size;
   const averageInvestment = investments.length > 0 ? totalInvested / investments.length : 0;
-  
+
   // Calculate portfolio value - use simple investment amount to match dashboard
   const estimatedValue = investments.reduce((sum, inv) => {
-    // Use the actual investment amount in OCT (already converted from MIST)
+    // Use the actual investment amount in MNT (already converted from MIST)
     const amount = Number(inv.investmentAmount) || 0;
     return sum + amount;
   }, 0);
-  
+
   const portfolioGrowth = totalInvested > 0 ? ((estimatedValue - totalInvested) / totalInvested) * 100 : 0;
 
   const handleTransferClick = (investment: any) => {
@@ -212,7 +213,7 @@ export default function MyInvestmentsPage() {
                     Track and manage your real-world asset investments
                   </Text>
                 </VStack>
-                
+
                 <Tooltip label="Refresh Portfolio" hasArrow>
                   <IconButton
                     aria-label="Refresh portfolio"
@@ -233,8 +234,8 @@ export default function MyInvestmentsPage() {
             </MotionBox>
 
             {/* Enhanced Portfolio Metrics */}
-            <SimpleGrid 
-              columns={{ base: 1, sm: 2, lg: 4 }} 
+            <SimpleGrid
+              columns={{ base: 1, sm: 2, lg: 4 }}
               spacing={6}
             >
               <MotionCard
@@ -257,9 +258,9 @@ export default function MyInvestmentsPage() {
                   <Stat>
                     <HStack spacing={3} mb={2}>
                       <Icon as={FaCoins} color="purple.500" boxSize={5} />
-                      <StatLabel 
-                        fontSize="sm" 
-                        fontWeight="700" 
+                      <StatLabel
+                        fontSize="sm"
+                        fontWeight="700"
                         color="gray.700"
                         textTransform="uppercase"
                         letterSpacing="wide"
@@ -267,13 +268,13 @@ export default function MyInvestmentsPage() {
                         Total Invested
                       </StatLabel>
                     </HStack>
-                    <StatNumber 
-                      fontSize="3xl" 
+                    <StatNumber
+                      fontSize="3xl"
                       fontWeight="900"
                       bgGradient="linear(135deg, purple.600 0%, blue.500 100%)"
                       bgClip="text"
                     >
-                      {totalInvested.toFixed(2)} OCT
+                      {totalInvested.toFixed(2)} MNT
                     </StatNumber>
                     <StatHelpText fontSize="sm" color="gray.600">
                       Across {uniqueProperties} properties
@@ -302,9 +303,9 @@ export default function MyInvestmentsPage() {
                   <Stat>
                     <HStack spacing={3} mb={2}>
                       <Icon as={FiTrendingUp} color="green.500" boxSize={5} />
-                      <StatLabel 
-                        fontSize="sm" 
-                        fontWeight="700" 
+                      <StatLabel
+                        fontSize="sm"
+                        fontWeight="700"
                         color="gray.700"
                         textTransform="uppercase"
                         letterSpacing="wide"
@@ -312,12 +313,12 @@ export default function MyInvestmentsPage() {
                         Portfolio Value
                       </StatLabel>
                     </HStack>
-                    <StatNumber 
-                      fontSize="3xl" 
+                    <StatNumber
+                      fontSize="3xl"
                       fontWeight="900"
                       color="green.500"
                     >
-                      {estimatedValue.toFixed(2)} OCT
+                      {estimatedValue.toFixed(2)} MNT
                     </StatNumber>
                     <StatHelpText>
                       <StatArrow type={portfolioGrowth >= 0 ? 'increase' : 'decrease'} />
@@ -347,9 +348,9 @@ export default function MyInvestmentsPage() {
                   <Stat>
                     <HStack spacing={3} mb={2}>
                       <Icon as={FaBuilding} color="blue.500" boxSize={5} />
-                      <StatLabel 
-                        fontSize="sm" 
-                        fontWeight="700" 
+                      <StatLabel
+                        fontSize="sm"
+                        fontWeight="700"
                         color="gray.700"
                         textTransform="uppercase"
                         letterSpacing="wide"
@@ -357,8 +358,8 @@ export default function MyInvestmentsPage() {
                         Total Shares
                       </StatLabel>
                     </HStack>
-                    <StatNumber 
-                      fontSize="3xl" 
+                    <StatNumber
+                      fontSize="3xl"
                       fontWeight="900"
                       color="blue.500"
                     >
@@ -391,9 +392,9 @@ export default function MyInvestmentsPage() {
                   <Stat>
                     <HStack spacing={3} mb={2}>
                       <Icon as={FaChartLine} color="orange.500" boxSize={5} />
-                      <StatLabel 
-                        fontSize="sm" 
-                        fontWeight="700" 
+                      <StatLabel
+                        fontSize="sm"
+                        fontWeight="700"
                         color="gray.700"
                         textTransform="uppercase"
                         letterSpacing="wide"
@@ -401,12 +402,12 @@ export default function MyInvestmentsPage() {
                         Avg Investment
                       </StatLabel>
                     </HStack>
-                    <StatNumber 
-                      fontSize="3xl" 
+                    <StatNumber
+                      fontSize="3xl"
                       fontWeight="900"
                       color="orange.500"
                     >
-                      {averageInvestment.toFixed(1)} OCT
+                      {averageInvestment.toFixed(1)} MNT
                     </StatNumber>
                     <StatHelpText fontSize="sm" color="gray.600">
                       Per property
@@ -423,8 +424,8 @@ export default function MyInvestmentsPage() {
               transition={{ delay: 0.5, duration: 0.6 } as any}
             >
               <Flex justify="space-between" align="center" mb={8}>
-                <Heading 
-                  size="xl" 
+                <Heading
+                  size="xl"
                   fontWeight="900"
                   color="white"
                   fontFamily="Outfit"
@@ -446,8 +447,8 @@ export default function MyInvestmentsPage() {
               </Flex>
 
               {isLoading ? (
-                <Box 
-                  textAlign="center" 
+                <Box
+                  textAlign="center"
                   py={20}
                   bg={glassBg}
                   backdropFilter="blur(20px)"
@@ -455,14 +456,14 @@ export default function MyInvestmentsPage() {
                   borderWidth="1px"
                   borderColor="whiteAlpha.300"
                 >
-                  <Spinner 
-                    size="xl" 
+                  <Spinner
+                    size="xl"
                     color="purple.500"
                     thickness="4px"
                     speed="0.8s"
                   />
-                  <Text 
-                    mt={6} 
+                  <Text
+                    mt={6}
                     color="whiteAlpha.900"
                     fontSize="lg"
                     fontWeight="600"
@@ -471,8 +472,8 @@ export default function MyInvestmentsPage() {
                   </Text>
                 </Box>
               ) : investments.length === 0 ? (
-                <Box 
-                  textAlign="center" 
+                <Box
+                  textAlign="center"
                   py={20}
                   bg={glassBg}
                   backdropFilter="blur(20px)"
@@ -482,8 +483,8 @@ export default function MyInvestmentsPage() {
                   borderStyle="dashed"
                 >
                   <Icon as={FaWallet} boxSize={16} color="whiteAlpha.600" mb={4} />
-                  <Text 
-                    fontSize="2xl" 
+                  <Text
+                    fontSize="2xl"
                     color="white"
                     fontWeight="700"
                     mb={2}
@@ -494,7 +495,7 @@ export default function MyInvestmentsPage() {
                     Your portfolio shows investments in properties, not your wallet balance.
                   </Text>
                   <Text fontSize="sm" color="whiteAlpha.600" fontWeight="400" mb={6}>
-                    You have OCT in your wallet - start investing to build your portfolio!
+                    You have MNT in your wallet - start investing to build your portfolio!
                   </Text>
                   <VStack spacing={3}>
                     <HStack spacing={3}>
@@ -531,8 +532,8 @@ export default function MyInvestmentsPage() {
                   </VStack>
                 </Box>
               ) : (
-                <SimpleGrid 
-                  columns={{ base: 1, lg: 2 }} 
+                <SimpleGrid
+                  columns={{ base: 1, lg: 2 }}
                   spacing={6}
                 >
                   {investments.map((investment: any, index: number) => (
@@ -547,7 +548,7 @@ export default function MyInvestmentsPage() {
                       borderWidth="1px"
                       borderColor="whiteAlpha.300"
                       overflow="hidden"
-                      _hover={{ 
+                      _hover={{
                         transform: "translateY(-6px)",
                         boxShadow: "0 20px 40px rgba(102, 126, 234, 0.4)",
                         borderColor: "purple.400",
@@ -574,7 +575,7 @@ export default function MyInvestmentsPage() {
                           h="50%"
                           bgGradient="linear(to-t, blackAlpha.800, transparent)"
                         />
-                        
+
                         {/* Property Type Badge */}
                         <Box
                           position="absolute"
@@ -588,8 +589,9 @@ export default function MyInvestmentsPage() {
                         >
                           <Badge
                             colorScheme="purple"
+                            color="black"
                             fontSize="xs"
-                            fontWeight="700"
+                            fontWeight="800"
                             textTransform="uppercase"
                           >
                             {investment.propertyDetails?.propertyType || "RWA"}
@@ -687,7 +689,7 @@ export default function MyInvestmentsPage() {
                                 {Number(investment.investmentAmount || 0).toFixed(2)}
                               </Text>
                               <Text fontSize="xs" color="green.500" fontWeight="600">
-                                OCT
+                                MNT
                               </Text>
                             </Box>
                           </SimpleGrid>
@@ -706,7 +708,7 @@ export default function MyInvestmentsPage() {
                                     YOUR VALUE
                                   </Text>
                                   <Text fontSize="lg" fontWeight="800" color="blue.600">
-                                    {Number(investment.investmentAmount || 0).toFixed(2)} OCT
+                                    {Number(investment.investmentAmount || 0).toFixed(2)} MNT
                                   </Text>
                                 </VStack>
                                 <VStack align="start" spacing={1}>
@@ -714,11 +716,11 @@ export default function MyInvestmentsPage() {
                                     SHARE PRICE
                                   </Text>
                                   <Text fontSize="lg" fontWeight="800" color="blue.600">
-                                    {Number(investment.propertyDetails.pricePerShare || 0)} OCT
+                                    {Number(investment.propertyDetails.pricePerShare || 0)} MNT
                                   </Text>
                                 </VStack>
                               </SimpleGrid>
-                              
+
                               {investment.propertyDetails.rentalYield && (
                                 <HStack
                                   mt={3}
@@ -741,16 +743,18 @@ export default function MyInvestmentsPage() {
                           <HStack spacing={3}>
                             <Button
                               leftIcon={<FaExchangeAlt />}
-                              colorScheme="purple"
                               variant="outline"
+                              borderColor="whiteAlpha.300"
+                              color="white"
+                              _hover={{
+                                bg: "whiteAlpha.200",
+                                borderColor: "purple.400",
+                                transform: "translateY(-1px)",
+                                boxShadow: "0 4px 12px rgba(102, 126, 234, 0.2)"
+                              }}
                               flex={1}
                               fontWeight="700"
-                              borderWidth="2px"
                               onClick={() => handleTransferClick(investment)}
-                              _hover={{
-                                transform: "translateY(-1px)",
-                                boxShadow: "0 4px 12px rgba(102, 126, 234, 0.3)"
-                              }}
                             >
                               Transfer
                             </Button>
@@ -771,9 +775,9 @@ export default function MyInvestmentsPage() {
                           </HStack>
 
                           {/* Investment ID */}
-                          <Text 
-                            fontSize="xs" 
-                            color="gray.500" 
+                          <Text
+                            fontSize="xs"
+                            color="gray.500"
                             fontFamily="mono"
                             textAlign="center"
                             pt={2}

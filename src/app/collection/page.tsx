@@ -44,7 +44,7 @@ export default function CollectionPage() {
   const [blockchainProperties, setBlockchainProperties] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [useBlockchainData, setUseBlockchainData] = useState(false);
-  
+
   // Chakra UI hooks - FIXED ORDER
   const { isOpen, onOpen, onClose } = useDisclosure();
   const { isOpen: isDetailsOpen, onOpen: onDetailsOpen, onClose: onDetailsClose } = useDisclosure();
@@ -59,11 +59,15 @@ export default function CollectionPage() {
   const fetchProperties = async () => {
     setIsLoading(true);
     try {
+      console.log('Fetching blockchain properties...');
+      const { propertyContractService } = await import('@/services/propertyContract');
       const properties = await propertyContractService.getAllProperties();
+      console.log('Fetched properties:', properties);
+
       setBlockchainProperties(properties);
       setUseBlockchainData(true);
     } catch (error) {
-      // Use secure logging instead of console.error
+      console.error('Error fetching properties:', error);
       setBlockchainProperties([]);
       setUseBlockchainData(true);
     } finally {
@@ -155,7 +159,7 @@ export default function CollectionPage() {
                 maxW="2xl"
                 fontFamily="Inter"
               >
-                Discover and invest in tokenized real-world assets on OneChain
+                Discover and invest in tokenized real-world assets on Mantle
               </Text>
             </VStack>
           </MotionBox>
@@ -382,7 +386,7 @@ export default function CollectionPage() {
                           Price/Share
                         </Text>
                         <Text fontSize="md" fontWeight="800" color="purple.500" fontFamily="Outfit">
-                          {item.pricePerShare || 0} OCT
+                          {item.pricePerShare || 0} MNT
                         </Text>
                       </VStack>
                       <VStack align="end" spacing={0.5}>
