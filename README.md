@@ -5,14 +5,14 @@
   
   <p><strong>A decentralized marketplace for tokenized Real-World Assets (RWA) with fractional ownership on Mantle Network.</strong></p>
   
-  <p><strong>🚀 Built on Mantle - the high-performance EVM-compatible L2 blockchain optimized for real-world asset tokenization.</strong></p>
+  <p><strong>🚀 Built on Mantle - the high-performance Ethereum Layer 2 (L2) blockchain optimized for real-world asset tokenization.</strong></p>
   
   <p>
-    <a href="https://nextjs.org/" target="_blank"><img src="https://img.shields.io/badge/Next.js-15-black?logo=next.js" alt="Next.js" /></a>
+    <a href="https://nextjs.org/" target="_blank"><img src="https://img.shields.io/badge/Next.js-16-black?logo=next.js" alt="Next.js" /></a>
     <a href="https://www.typescriptlang.org/" target="_blank"><img src="https://img.shields.io/badge/TypeScript-5-3178C6?logo=typescript&logoColor=white" alt="TypeScript" /></a>
     <a href="https://chakra-ui.com/" target="_blank"><img src="https://img.shields.io/badge/Chakra%20UI-2-319795?logo=chakraui&logoColor=white" alt="Chakra UI" /></a>
     <a href="https://soliditylang.org/" target="_blank"><img src="https://img.shields.io/badge/Solidity-0.8.24-363636?logo=solidity&logoColor=white" alt="Solidity" /></a>
-    <a href="https://mantle.xyz/" target="_blank"><img src="https://img.shields.io/badge/Mantle-Network-00D4AA?logo=ethereum&logoColor=white" alt="Mantle" /></a>
+    <a href="https://mantle.xyz/" target="_blank"><img src="https://img.shields.io/badge/Mantle-Network-50AF95?logo=ethereum&logoColor=white" alt="Mantle" /></a>
     <a href="https://rainbowkit.com/" target="_blank"><img src="https://img.shields.io/badge/RainbowKit-2.1-FF6B6B?logo=rainbow&logoColor=white" alt="RainbowKit" /></a>
   </p>
 </div>
@@ -26,233 +26,43 @@
 - [Requirements](#requirements)
 - [Getting Started](#getting-started)
 - [Project Structure](#project-structure)
-- [Scripts](#scripts)
+- [Smart Contracts](#smart-contracts)
 - [Environment](#environment)
 - [Workflow](#workflow)
-- [Mermaid Flowchart (Dev + User Flow)](#mermaid-flowchart-dev--user-flow)
-- [Demo](#demo)
 - [Troubleshooting](#troubleshooting)
-- [Contributing](#contributing)
 - [License](#license)
-## Gallery
-<img width="1899" height="876" alt="Screenshot 2025-12-20 110511" src="https://github.com/user-attachments/assets/dae2b89c-55f5-4d88-9ede-e4978c50a789" />
-<img width="1899" height="866" alt="Screenshot 2025-12-20 110613" src="https://github.com/user-attachments/assets/bf568118-9d92-46af-8df2-aa4035431b93" />
-<img width="1900" height="865" alt="Screenshot 2025-12-20 110728" src="https://github.com/user-attachments/assets/b6eafe42-3426-4850-9539-58711a95cf0c" />
-<img width="1901" height="872" alt="Screenshot 2025-12-20 110812" src="https://github.com/user-attachments/assets/699bea01-f845-4ecc-9610-4826f6329615" />
-<img width="1908" height="844" alt="Screenshot 2025-12-20 111213" src="https://github.com/user-attachments/assets/0d0035aa-d095-41fe-89d5-8acea55b50a4" />
 
+---
 
-
-## ✨ Enhanced Features
+## ✨ Features
 
 ### 🎨 **Professional UI/UX**
-- **Custom Typography**: Outfit for headings, Inter for body text, Space Grotesk for code
-- **Smooth Animations**: Framer Motion powered transitions and micro-interactions
-- **Modern Design**: Gradient backgrounds, glass morphism effects, and professional layouts
-- **Responsive Design**: Optimized for desktop, tablet, and mobile devices
-- **Enhanced Dashboard**: Real-time portfolio analytics with interactive charts
-- **Professional Error Handling**: Comprehensive error messages and status notifications
+- **Modern Design**: Gradient backgrounds, glassmorphism, and professional layouts using Chakra UI.
+- **Smooth Animations**: Powered by Framer Motion for high-end micro-interactions.
+- **Responsive**: Optimized for desktop, tablet, and mobile devices.
+- **Enhanced Dashboard**: Real-time portfolio analytics with interactive metrics.
 
-### 🛒 **Complete Trading System**
-- **Advanced Buy Interface**: Modal-based purchase system with quantity selection
-- **Real-time Pricing**: Dynamic price calculations and total cost display
-- **Transaction Management**: Comprehensive error handling and success notifications
-- **Multi-token Support**: Native tokens and ERC20 token payments
-- **Investment Tracking**: Real-time portfolio updates with blockchain verification
-- **Share Transfer**: Transfer Investment NFTs to other users
+### 🛒 **RWA Marketplace**
+- **Fractional Ownership**: Standardized share system built directly into the property smart contract.
+- **Buy/Transfer Interface**: Seamlessly buy shares or transfer them to other wallet addresses.
+- **Real-time Pricing**: Dynamic price calculations and instant MNT cost display.
+- **Investment Tracking**: Real-time portfolio updates with on-chain verification.
 
-### 💳 **Mantle Wallet Integration**
-- **OneWallet Support**: Native integration with Mantle Wallet via Wallet Standard
-- **Seamless Connection**: One-click wallet connection with account detection
-- **Transaction Signing**: Secure transaction signing with gas fee display
-- **Security First**: All transactions require user approval in wallet popup
-- **Auto-Reconnection**: Maintains wallet connection across page refreshes
-- **Balance Tracking**: Real-time MNT balance display and updates
+### 💳 **EVM Wallet Integration**
+- **RainbowKit & Wagmi**: Native support for MetaMask, Coinbase Wallet, Rainbow, and more.
+- **Seamless Connection**: One-click wallet connection with automatic Mantle network detection.
+- **Secure Transactions**: All operations required user approval via standard EIP-712 or standard signing.
 
-### 🔍 **Advanced Marketplace**
-- **Smart Search**: Real-time search with filtering by asset type and category
-- **Professional Cards**: Enhanced asset cards with pricing, APY, and investment details
-- **Category Filtering**: Filter by Real Estate, Carbon Credits, and more
-- **Investment Analytics**: Expected returns and investment minimums displayed
-- **Live Updates**: Real-time availability and share count updates
-- **Property Images**: High-quality property images with fallback support
+### 🔒 **Security & Production Ready**
+- **Hardhat Tested**: Comprehensive test suite for fractionalization and trading logic.
+- **Secure Logging**: Production-safe logging system that sanitizes sensitive data.
+- **Verified Contracts**: Designed for Mantle Network deployment with standard OpenZeppelin security.
 
-### 📊 **Comprehensive Dashboard**
-- **Portfolio Analytics**: Track your investments with visual charts and statistics
-- **Asset Categorization**: Organized view of your holdings by asset type
-- **Performance Metrics**: ROI tracking and investment history
-- **Multi-chain Portfolio**: Unified view across all supported networks
-- **Real-time Data**: Live blockchain data integration
-- **Investment Cards**: Detailed cards showing shares, value, and yield
+---
 
-### 🔒 **Security & Testing (Phase 2 Complete)**
-- **Comprehensive Unit Tests**: 17 passing tests covering all fractionalization and trading logic
-- **Security Documentation**: Complete security analysis with edge cases and risk mitigation
-- **Secure Logging**: Production-safe logging system that sanitizes sensitive data
-- **Input Validation**: Client and server-side validation for all user inputs
-- **Error Handling**: Graceful error handling with user-friendly messages
-- **Production Ready**: All Phase 2 requirements met and verified
+## 🏗️ Workflow & Architecture
 
-## �️ Phase 2: Security, Stability & Documentation - **COMPLETE**
-
-### **Grant Requirements Met: $200 Phase 2**
-
-#### ✅ **1. Unit Tests for Fractionalization and Trading Logic**
-- **17 comprehensive unit tests** covering all core functionality
-- **Property Creation**: Tests for NFT minting, validation, and error handling
-- **Investment Logic**: Tests for share purchasing, MNT/MIST conversion, and fund validation
-- **Trading Operations**: Tests for Investment NFT transfers and ownership verification
-- **Edge Cases**: Tests for invalid inputs, network errors, and boundary conditions
-- **All tests passing**: 100% success rate with proper mocking and blockchain simulation
-
-#### ✅ **2. Enhanced Front-end UX with Error and Status Messages**
-- **Professional Error Handling**: User-friendly error messages for all failure scenarios
-- **Loading States**: Progress indicators and status updates during blockchain operations
-- **Success Notifications**: Detailed success messages with transaction links and copy functionality
-- **Input Validation**: Real-time validation with helpful error messages
-- **Toast Notifications**: Comprehensive notification system for all user actions
-- **Transaction Tracking**: Real-time updates with blockchain explorer integration
-
-#### ✅ **3. Complete Security Documentation**
-- **Edge Cases Analysis**: Comprehensive documentation of all potential vulnerabilities
-- **Risk Considerations**: Detailed risk assessment with mitigation strategies
-- **Security Measures**: Implementation details of all security features
-- **Best Practices**: Guidelines for secure development and deployment
-- **Incident Response**: Procedures for handling security incidents
-- **Compliance Framework**: Security checklist and monitoring guidelines
-
-### **Technical Achievements**
-
-#### **Secure Logging System**
-```typescript
-// Production-safe logging that sanitizes sensitive data
-logger.investment('Investment successful', { 
-  amount: sanitizedAmount,
-  shares: shareCount 
-}); // Addresses and keys automatically redacted
-```
-
-#### **Comprehensive Error Handling**
-```typescript
-// User-friendly error messages with specific guidance
-if (errorMessage.includes('insufficient funds')) {
-  toast({
-    title: "Insufficient Funds",
-    description: `You need ${totalCost} MNT to complete this investment.`,
-    status: "error"
-  });
-}
-```
-
-#### **Complete Test Coverage**
-```bash
-📋 Test Results Summary
-================================
-✅ Property Creation Tests: 4/4 PASSED
-✅ Investment Logic Tests: 4/4 PASSED  
-✅ Trading Operations Tests: 2/2 PASSED
-✅ Property Fetching Tests: 3/3 PASSED
-✅ User Investment Tests: 2/2 PASSED
-✅ Package Deployment Tests: 2/2 PASSED
-================================
-Total: 17/17 TESTS PASSED ✅
-```
-
-### **Security Documentation Highlights**
-
-- **🔒 Input Validation**: All user inputs validated client and server-side
-- **🛡️ Access Control**: Proper ownership verification for all operations
-- **🔐 Transaction Security**: Safe gas handling and user confirmation flows
-- **📊 Monitoring**: Comprehensive logging and error tracking
-- **⚠️ Risk Mitigation**: Detailed strategies for all identified vulnerabilities
-- **📋 Compliance**: Security checklist and best practices documentation
-
-### **Production Readiness**
-
-The application now meets enterprise-grade standards for:
-- **Security**: Comprehensive security measures and documentation
-- **Testing**: Full test coverage with edge case handling
-- **UX**: Professional error handling and user feedback
-- **Monitoring**: Production-safe logging and error tracking
-- **Documentation**: Complete technical and security documentation
-
-**🚀 Phase 2 Status: COMPLETE AND READY FOR SUBMISSION**
-
-## 🏗️ Smart Contracts (Move Language)
-
-This project uses Move smart contracts deployed on Mantle:
-
-### **property_nft.move**
-- **PropertyNFT Object**: Represents unique real-world properties as NFTs
-- **Built-in Fractionalization**: Properties have `totalShares` and `availableShares` fields
-- **Investment Function**: Users can buy fractional shares directly from the property
-- **Investment NFT**: Each investment creates an Investment object tracking shares owned
-
-### **Key Features**
-- **create_property**: Mint a new PropertyNFT with metadata and share configuration
-- **invest**: Buy fractional shares by paying MNT tokens
-- **transfer_investment**: Transfer Investment NFTs to other users
-- **No separate fractionalization step**: Shares are built into the PropertyNFT structure
-
-## 🔗 Mantle Integration Benefits
-
-### **Why Mantle for RWA?**
-- **Optimized for Real-World Assets**: Purpose-built blockchain for tokenizing physical assets
-- **Low Transaction Costs**: Minimal fees for fractionalization and trading operations
-- **Fast Settlement**: Quick confirmation times for asset transactions
-- **Regulatory Compliance**: Built-in compliance features for asset tokenization
-- **Interoperability**: Seamless integration with traditional financial systems
-
-### **Mantle-Specific Features**
-- **🏠 Property Tokenization**: Direct integration with real estate verification systems
-- **🌱 Carbon Credit Trading**: Native support for environmental asset tokenization
-- **⚡ Instant Fractionalization**: Split assets into tradeable fractions in seconds
-- **🔄 Seamless Redemption**: Collect fractions to redeem complete asset ownership
-- **📊 Real-time Analytics**: Live tracking of asset performance and trading volume
-- **🛡️ Compliance Badges**: Automated verification and compliance checking
-
-## Tech Stack
-
-- **Blockchain**: Mantle Testnet (Sui-based)
-- **Frontend**: Next.js 14, React 18, TypeScript
-- **UI Library**: Chakra UI with custom themes
-- **Web3 SDK**: @mysten/sui for Mantle interactions
-- **Smart Contracts**: Move language (property_nft.move)
-- **Wallet Integration**: Wallet Standard protocol for OneWallet
-- **State Management**: React hooks and context
-- **File Storage**: IPFS via Pinata for NFT metadata
-- **Styling**: Chakra UI components with responsive design
-
-## Supported Network
-
-### Mantle Testnet
-- **RPC URL**: https://rpc-testnet.onelabs.cc:443
-- **Chain Identifier**: `Mantle:testnet`
-- **Native Token**: MNT (Mantle Token)
-- **Gas Coin Type**: `0x2::MNT::MNT`
-- **Explorer**: https://Explorer.cc/testnet/home
-- **Faucet**: https://faucet-testnet.onelabs.cc
-
-## Move Package Deployment
-
-Your deployed Move package address should be set in `.env.local`:
-
-```env
-NEXT_PUBLIC_RWA_PACKAGE_ID=YOUR_PACKAGE_ID_HERE
-```
-
-To deploy your own package:
-```bash
-one move build
-one client publish --gas-budget 100000000
-```
-
-The package ID will be displayed in the output after successful deployment.
-
-
-## 🏗️ Property NFT Creation → Fractionalization → Listing Flow
-
-### Complete Workflow
+### **Property NFT Creation → Fractionalization → Listing Flow**
 
 ```mermaid
 flowchart TD
@@ -260,11 +70,11 @@ flowchart TD
     
     Create --> CreateDetails[Property Details:<br/>- Name & Description<br/>- Location & Type<br/>- Total Value<br/>- Total Shares<br/>- Price per Share MNT<br/>- Rental Yield]
     
-    CreateDetails --> Mint[2. Mint Property NFT]
-    Mint --> MintTx[Transaction on Mantle<br/>PropertyNFT Object Created]
+    Create --> Mint[2. Mint Property NFT]
+    Mint --> MintTx[Transaction on Mantle<br/>Solidity: createProperty]
     
     MintTx --> Fractional[3. Automatic Fractionalization]
-    Fractional --> FracDetails[Fractional Shares:<br/>- Total Shares: 10,000<br/>- Available: 10,000<br/>- Price: 0.001 MNT/share<br/>- Stored On-Chain]
+    Fractional --> FracDetails[Fractional Shares:<br/>- Total Shares: 10,000<br/>- Available: 10,000<br/>- Price: 1 MNT/share<br/>- Stored in Solidity Contract]
     
     FracDetails --> List[4. Auto-Listed in Marketplace]
     List --> ListDetails[Marketplace Listing:<br/>- Visible to all users<br/>- Real-time availability<br/>- Instant investment ready]
@@ -273,16 +83,16 @@ flowchart TD
     Invest --> InvestOptions{Investment Options}
     
     InvestOptions --> BuyShares[Buy Fractional Shares]
-    BuyShares --> ShareDetails[Purchase Details:<br/>- Min: 1 share<br/>- Max: Available shares<br/>- Payment in MNT<br/>- Gas: ~0.05 MNT]
+    BuyShares --> ShareDetails[Purchase Details:<br/>- Min: 1 share<br/>- Max: Available shares<br/>- Payment in MNT<br/>- Gas: Minimal MNT]
     
-    ShareDetails --> InvestNFT[Investment NFT Created]
-    InvestNFT --> InvestRecord[Investment Record:<br/>- Property ID<br/>- Shares Owned<br/>- Investment Amount<br/>- Timestamp]
+    ShareDetails --> InvestUpdate[Share Balance Updated]
+    InvestUpdate --> InvestRecord[Investment Record:<br/>- Property ID<br/>- Shares Owned<br/>- Investment Amount<br/>- Timestamp]
     
     InvestRecord --> Portfolio[6. Track in Portfolio]
     Portfolio --> PortfolioView[My Investments Page:<br/>- Total Invested<br/>- Total Shares<br/>- Properties Owned<br/>- Real-time Updates]
     
     PortfolioView --> Transfer[7. Transfer Shares Optional]
-    Transfer --> TransferTx[Transfer Investment NFT<br/>to Another User]
+    Transfer --> TransferTx[Transfer Shares<br/>to Another Address]
     
     TransferTx --> End[End: Complete Ownership Cycle]
     
@@ -293,40 +103,40 @@ flowchart TD
     style Portfolio fill:#4299e1,stroke:#3182ce,color:#fff
 ```
 
-### Technical Implementation
+### **Technical Implementation Architecture**
 
 ```mermaid
 flowchart LR
-    subgraph Creation[Property Creation]
+    subgraph Creation[Asset Creation]
         A[User Input] --> B[CreatePropertyForm]
         B --> C[propertyContract.createProperty]
-        C --> D[Move: create_property]
-        D --> E[PropertyNFT Object]
+        C --> D[Solidity: createProperty]
+        D --> E[On-Chain State]
     end
     
-    subgraph Fractionalization[Built-in Fractionalization]
-        E --> F[totalShares: 10000]
-        F --> G[availableShares: 10000]
-        G --> H[pricePerShare: MNT]
-        H --> I[Stored in PropertyNFT]
+    subgraph Fractionalization[EVM Fractionalization]
+        E --> F[Total Shares]
+        F --> G[Available Shares]
+        G --> H[Price per Share]
+        H --> I[ERC721 Metadata]
     end
     
-    subgraph Listing[Marketplace Integration]
-        I --> J[getAllProperties]
+    subgraph Listing[Marketplace]
+        I --> J[fetchProperties]
         J --> K[Collection Page]
         K --> L[Display Cards]
         L --> M[Investment Modal]
     end
     
-    subgraph Investment[Investment Process]
-        M --> N[User Selects Shares]
+    subgraph Investment[Investment Flow]
+        M --> N[User Input]
         N --> O[propertyContract.invest]
-        O --> P[Move: invest function]
-        P --> Q[Investment NFT Created]
-        Q --> R[Shares Deducted]
+        O --> P[Solidity: invest function]
+        P --> Q[Transfer MNT]
+        Q --> R[Update mapping]
     end
     
-    subgraph Portfolio[Portfolio Tracking]
+    subgraph Portfolio[Portfolio Logic]
         R --> S[getUserInvestments]
         S --> T[My Investments Page]
         T --> U[Real-time Balance]
@@ -340,580 +150,149 @@ flowchart LR
     style Portfolio fill:#fff0f6
 ```
 
-### Key Features
-
-#### 1️⃣ **Property NFT Creation**
-- **Input**: Property details (name, location, value, shares, price)
-- **Output**: Unique PropertyNFT object on Mantle
-- **Gas**: ~0.01 MNT
-- **Time**: ~3-5 seconds
-
-#### 2️⃣ **Automatic Fractionalization**
-- **Built-in**: No separate fractionalization step needed
-- **Shares**: Defined at creation (e.g., 10,000 shares)
-- **Price**: Set in MNT (e.g., 0.001 MNT per share)
-- **Flexible**: Users can buy 1 to all available shares
-
-#### 3️⃣ **Instant Marketplace Listing**
-- **Auto-listed**: Property appears immediately in marketplace
-- **Real-time**: Updates as shares are purchased
-- **Searchable**: Filterable by type, location, price
-- **Transparent**: All details visible to investors
-
-#### 4️⃣ **Investment Process**
-- **Simple**: Select shares → Confirm → Sign transaction
-- **Fast**: Investment completes in seconds
-- **Secure**: Blockchain-verified ownership
-- **Tracked**: Investment NFT created for each purchase
-
-#### 5️⃣ **Portfolio Management**
-- **Dashboard**: View all investments in one place
-- **Real-time**: Live updates of share counts
-- **Transferable**: Send Investment NFTs to others
-- **Analytics**: Track total invested, shares owned
-
-### Smart Contract Functions
-
-```move
-// 1. Create Property NFT
-public entry fun create_property(
-    name: String,
-    description: String,
-    image_url: String,
-    location: String,
-    property_type: String,
-    total_value: u64,
-    total_shares: u64,
-    price_per_share: u64,
-    rental_yield: String,
-    ctx: &mut TxContext
-)
-
-// 2. Invest in Property (Buy Shares)
-public entry fun invest(
-    property: &mut PropertyNFT,
-    payment: Coin<MNT>,
-    shares_to_buy: u64,
-    ctx: &mut TxContext
-)
-
-// 3. Transfer Investment
-public entry fun transfer_investment(
-    investment: Investment,
-    recipient: address,
-    _ctx: &mut TxContext
-)
-```
-
-### Example Usage
-
-#### Create Property
-```bash
-one client call \
-  --package YOUR_PACKAGE_ID \
-  --module property_nft \
-  --function create_property \
-  --args "Sunset Villa" "Luxury beachfront property" \
-         "https://example.com/villa.jpg" "Miami Beach" \
-         "Residential" 1000000 10000 100 "8.5%" \
-  --gas-budget 50000000
-```
-
-#### Invest in Property
-```bash
-one client call \
-  --package YOUR_PACKAGE_ID \
-  --module property_nft \
-  --function invest \
-  --args [PROPERTY_OBJECT_ID] [COIN_OBJECT_ID] 100 \
-  --gas-budget 50000000
-```
-
-> **Note**: Replace `YOUR_PACKAGE_ID` with your deployed package ID, and use actual object IDs for property and coin.
-
-### Benefits
-
-✅ **Simplified**: No separate fractionalization step  
-✅ **Efficient**: One-time property creation  
-✅ **Flexible**: Any number of shares (1 to total)  
-✅ **Transparent**: All data on-chain  
-✅ **Instant**: Immediate marketplace visibility  
-✅ **Secure**: Blockchain-verified ownership  
-✅ **Transferable**: Investment NFTs can be traded  
-
----
-
-## Mantle Integration Flow
-
-## Dev + User Flow
+### **Dev + User Flow**
 
 ```mermaid
 flowchart TD
   subgraph Dev[Developer Workflow]
     A[Clone Repo] --> B[Install Deps]
-    B --> C[Create .env.local\nNEXT_PUBLIC_TW_CLIENT_ID]
-    C --> D{Deploy to Mantle?}
-    D -- Yes --> E[Configure Mantle RPC]
-    E --> F[Deploy RWA Contracts]
-    F --> G[Deploy Marketplace]
-    D -- No --> H[Use Testnet]
-    G --> I[Update Contract Addresses]
+    B --> C[Create .env.local]
+    C --> D{Deploy Contracts?}
+    D -- Yes --> E[Configure Hardhat]
+    E --> F[Run: hardhat deploy]
+    F --> G[Update Config Addresses]
+    D -- No --> H[Use Deployed Testnet]
+    G --> I[Run: npm run dev]
     H --> I
-    I --> J[Run: npm run dev]
   end
 
-  subgraph User[End-User Flow on Mantle]
-    K[Open App / Landing] --> L[Connect Wallet to Mantle]
-    L --> M{Connected to Mantle?}
-    M -- Yes --> N[Browse RWA Marketplace]
-    M -- No --> O[Switch to Mantle Network]
+  subgraph User[End-User Flow]
+    K[Open Marketplace] --> L[Connect EVM Wallet]
+    L --> M{Correct Network?}
+    M -- Yes --> N[Browse Properties]
+    M -- No --> O[Switch to Mantle Sepolia]
     O --> N
-    N --> P[View Property/Asset Details]
-    P --> Q{Investment Action}
-    Q -- Buy Fractions --> R[Purchase ERC20 Tokens]
-    Q -- Buy Full Asset --> S[Purchase Complete NFT]
-    Q -- List Asset --> T[Create Marketplace Listing]
-    Q -- Fractionalize --> U[Split into ERC20 Tokens]
+    N --> P[View Asset Details]
+    P --> Q{Action}
+    Q -- Buy Shares --> R[Transaction Confirmation]
+    Q -- List Asset --> T[Create Listing]
+    Q -- Transfer --> U[Wallet Sign]
     
-    R --> V[Track Fractional Ownership]
-    S --> W[Full Asset Management]
-    U --> X[Enable Secondary Trading]
-    V --> Y{Collect All Fractions?}
-    Y -- Yes --> Z[Redeem Full Asset]
-    Y -- No --> AA[Continue Trading]
+    R --> V[Track Shares]
+    T --> W[Marketplace Update]
+    U --> X[Ownership Update]
   end
 
-  J --> K
+  I --> K
 ```
 
-## 🚀 Quick Start - Mantle Testnet
+---
+
+## 🏗️ Smart Contracts (Solidity)
+
+The platform is powered by the **PropertyNFT.sol** contract, an ERC721-based asset manager with built-in fractionalization.
+
+### **Key Functions**
+- `createProperty(...)`: Mint a new RWA property with metadata, shares, and price configuration.
+- `invest(uint256 propertyId, uint256 shares)`: Invest in a property by paying MNT.
+- `transferShares(uint256 propertyId, address to, uint256 shares)`: Transfer your fractional shares to another user.
+- `distributeDividends(uint256 propertyId)`: Managers can distribute earnings to share holders.
+- `claimDividends(uint256 propertyId)`: Investors can claim their share of property revenue.
+
+---
+
+## 🔗 Mantle Integration
+
+### **Why Mantle for RWA?**
+- **High Scalability**: Built on Ethereum L2 to handle high trading volumes with minimal lag.
+- **Low Gas Fees**: Fractionalizing assets costs cents, not dollars.
+- **EVM Compatibility**: Uses standard Ethereum tools (Hardhat, Ethers, EIPs).
+- **Security**: Inherits Ethereum's security through Mantle's modular architecture.
+
+### **Network Configuration (Mantle Sepolia)**
+- **RPC URL**: `https://rpc.sepolia.mantle.xyz`
+- **Chain ID**: `5003`
+- **Native Token**: `MNT`
+- **Explorer**: `https://sepolia.mantlescan.xyz`
+
+---
+
+## 🚀 Quick Start
 
 ### Prerequisites
-- **Node.js 18+** and npm installed
-- **Mantle CLI** installed (for Move contract deployment)
-  - Install from: https://docs.Mantle.network
-- **OneWallet** browser extension
-  - Install from Mantle official website
-- **MNT Tokens** for gas fees
-  - Get from faucet: https://faucet-testnet.onelabs.cc
+- **Node.js 18+**
+- **MetaMask** or any EVM wallet.
+- **MNT Testnet Tokens**: Get them from the [Mantle Faucet](https://faucet.sepolia.mantle.xyz).
 
-### Deploy and Run in 5 Minutes
+### Installation
 
-#### 1. Clone and Install
-```bash
-git clone https://github.com/Aaditya1273/RWA-Exchange.git
-cd RWA-Exchange
-npm install
-```
-
-#### 2. Configure Environment
-```bash
-cp .env.example .env.local
-# Edit .env.local with your configuration
-```
-
-Required environment variables:
-```env
-# Mantle Configuration
-NEXT_PUBLIC_Mantle_RPC_URL=https://rpc-testnet.onelabs.cc:443
-NEXT_PUBLIC_Mantle_NETWORK=testnet
-NEXT_PUBLIC_RWA_PACKAGE_ID=YOUR_PACKAGE_ID
-
-# Pinata IPFS (for image uploads)
-NEXT_PUBLIC_PINATA_JWT=your_pinata_jwt_token
-NEXT_PUBLIC_PINATA_GATEWAY=your_pinata_gateway_url
-```
-
-> **Important**: For Vercel deployment, add these environment variables in the Vercel dashboard under Settings → Environment Variables.
-
-#### 3. Deploy Move Package (If Needed)
-```bash
-# Build Move package
-one move build
-
-# Deploy to Mantle testnet
-one client publish --gas-budget 100000000
-
-# Save the Package ID from output
-```
-
-
-#### 4. Create a Property NFT
-```bash
-one client call \
-  --package  \
-  --module property_nft \
-  --function create_property YOUR_PACKAGE_ID\
-  --args "Sunset Villa Estate" "Luxury beachfront property" \
-         "https://example.com/villa.jpg" "Miami Beach, FL" \
-         "Residential" 1000000 10000 100 "8.5%" \
-  --gas-budget 10000000
-```
-
-#### 5. Invest in Property (Fractionalization)
-```bash
-one client call \
-  --package YOUR_PACKAGE_ID \
-  --module property_nft \
-  --function invest \
-  --args [PROPERTY_OBJECT_ID] [COIN_OBJECT_ID] 100 \
-  --gas-budget 10000000
-```
-
-#### 6. Run Frontend
-```bash
-npm run dev
-```
-
-Open [http://localhost:3000](http://localhost:3000) to view the marketplace.
-
-### Verify Deployment
-- **Package Explorer**: https://Explorer.cc/testnet/object/YOUR_PACKAGE_ID
-- **Check Objects**: `one client objects`
-- **View Transaction**: `one client tx-block [TX_HASH]`
-- **Explorer Explorer**: https://Explorer.cc/testnet/home
-
----
-
-## ⚠️ Feature Caveats & Limitations
-
-### Current Limitations
-
-#### Production Status
-- ✅ **Phase 2 Complete**: All security requirements met with comprehensive testing
-- ✅ **Production Ready**: Secure logging, input validation, and error handling implemented
-- ⚠️ **Testnet Only**: Currently deployed on Mantle testnet for demonstration
-- ⚠️ **Demo Purpose**: Hackathon/demo project - professional audit recommended for mainnet
-
-#### Technical Limitations
-- **OneWallet Only**: Currently only supports OneWallet browser extension
-- **Manual Gas Selection**: Gas coins must be manually selected for transactions
-- **Transaction Confirmation**: May take 5-10 seconds for finality on testnet
-- **RPC Timeouts**: Mantle testnet RPC may occasionally timeout, retry if needed
-
-#### Feature Gaps
-- **Dividend Distribution**: Manual process, not automated
-- **KYC Integration**: Placeholder only, not enforced in current version
-- **Secondary Market**: Fraction trading not yet implemented
-- **Multi-signature**: Property management requires single owner only
-- **Mobile Wallet**: Limited mobile wallet support
-
-### Known Issues
-
-#### Frontend
-- Balance refresh requires manual trigger
-- Some wallet connections may require page refresh
-- Explorer links may not work if testnet is down
-
-#### Smart Contracts (Move)
-- Investment NFTs are non-transferable by default (requires custom transfer function)
-- No refund mechanism if property investment fails
-- Rental yield distribution not automated (manual process)
-- Share price is fixed at creation (no dynamic pricing)
-
-#### Network
-- Mantle testnet may have occasional downtime
-- Gas estimation may be inaccurate
-- Event indexing may lag behind transactions
-
-### Security Status: ✅ **PHASE 2 COMPLETE**
-
-#### Implemented Security Measures:
-
-1. **Comprehensive Testing**: 17 unit tests covering all fractionalization and trading logic
-2. **Secure Logging**: Production-safe logging system that sanitizes sensitive data
-3. **Input Validation**: Client and server-side validation for all user inputs
-4. **Error Handling**: Graceful error handling with user-friendly messages
-5. **Transaction Security**: Proper gas handling and user confirmation flows
-6. **Access Control**: Ownership verification for all privileged operations
-
-#### Security Documentation:
-- **Complete Risk Analysis**: All edge cases and vulnerabilities documented
-- **Mitigation Strategies**: Detailed security measures for each identified risk
-- **Best Practices**: Security guidelines for developers and users
-- **Incident Response**: Procedures for handling security incidents
-
-⚠️ **IMPORTANT SECURITY NOTES**:
-
-1. **Wallet Security**: Always verify transaction details in OneWallet before signing
-2. **Test Environment**: Currently on testnet - use only test tokens
-3. **Gas Fees**: Always ensure you have sufficient MNT for gas fees (~0.05 MNT per transaction)
-4. **Professional Audit**: Recommended before mainnet deployment for production use
-
-### Recommended Use Cases
-
-✅ **Production Ready For**:
-- Educational RWA tokenization platforms
-- Testnet demonstrations and proofs of concept
-- Hackathon submissions and competitions
-- Learning blockchain development
-- Testing fractional ownership concepts
-
-✅ **Phase 2 Complete Features**:
-- Comprehensive unit testing (17 tests passing)
-- Security documentation and risk analysis
-- Production-safe error handling and logging
-- Professional UI/UX with status messages
-- Real blockchain data integration
-
-❌ **Still Requires for Mainnet**:
-- Professional security audit
-- Regulatory compliance integration
-- Insurance mechanisms
-- Enterprise-grade infrastructure
-- Real KYC/AML implementation
-
-### Future Improvements
-
-**Planned Enhancements**:
-- Professional security audit
-- Automated dividend distribution
-- Real KYC/AML integration
-- Secondary marketplace for fractions
-- Multi-signature property management
-- Mobile app support
-- Advanced analytics dashboard
-- Integration with real estate APIs
-- Regulatory compliance features
-- Insurance mechanisms
-
-### Getting Help
-
-If you encounter issues:
-1. Check the [Troubleshooting](#troubleshooting) section below
-2. Visit Mantle documentation: https://docs.Mantle.network
-3. Check Mantle faucet for MNT tokens: https://faucet-testnet.onelabs.cc
-4. Open an issue on GitHub
-
----
-
-## 🔧 Technical Deep Dive: Wallet Integration
-
-### Challenge: OneWallet Sign Button Disabled
-
-During development, we encountered a critical issue where the OneWallet Sign button remained disabled when creating NFTs. Here's how we solved it:
-
-#### Root Causes Identified:
-1. **Missing Gas Owner**: The `gasData.owner` field was null
-2. **Zero Network Fee**: Wallet couldn't calculate gas fees
-3. **Transaction Format**: Wallet expected specific transaction structure
-
-#### Solution Implemented:
-```typescript
-// 1. Manually fetch and set gas payment coins
-const gasCoins = await client.getCoins({
-  owner: address,
-  coinType: '0x2::MNT::MNT'
-});
-
-transaction.setGasPayment(gasCoins.data.map(coin => ({
-  objectId: coin.coinObjectId,
-  version: coin.version,
-  digest: coin.digest
-})));
-
-// 2. Explicitly set gas owner
-transaction.setGasOwner(address);
-
-// 3. Build transaction to populate gas data
-await transaction.build({ client });
-
-// 4. Pass Transaction object (not bytes) to wallet
-await wallet.signAndExecuteTransaction({
-  transaction: transaction,  // Has toJSON() method
-  account: connectedAccount,
-  chain: 'Mantle:testnet'
-});
-```
-
-#### Key Learnings:
-- OneWallet requires the **Transaction object** (not bytes) because it needs the `toJSON()` method
-- Gas data must be **populated before** passing to wallet (via `build()`)
-- Gas owner must be **explicitly set** to match the sender address
-- Chain identifier must be `'Mantle:testnet'` (not `'sui:testnet'`)
-
-This implementation ensures the wallet can properly display transaction details and calculate network fees.
-
-```
-
-
-
-
-## Project Structure
-
-- `sources/` — Move smart contracts (`property_nft.move`).
-- `scripts/` — Deployment scripts for Mantle.
-- `tests/` — Comprehensive test suite (Phase 2 complete).
-  - `tests/property-contract.test.ts` — Unit tests for fractionalization and trading logic
-  - `tests/components.test.tsx` — Component integration tests
-  - `tests/setup.ts` — Test configuration and mocks
-  - `tests/run-all-tests.js` — Phase 2 test runner
-- `src/` — Next.js app and components.
-  - `src/app/` — Next.js routes (e.g., `collection/`, `create-property/`, `my-investments/`, `dashboard/`).
-  - `src/components/` — UI components (e.g., `PropertyCreationForm.tsx`, `InvestmentModal.tsx`).
-  - `src/services/` — Blockchain services (e.g., `propertyContract.ts`, `Mantle.ts`).
-  - `src/utils/` — Utility functions including `secureLogger.ts` for production-safe logging.
-  - `src/hooks/` — Custom React hooks for wallet and blockchain integration.
-  - `src/consts/` — Configuration constants.
-- `phase2-plan/` — Phase 2 documentation and security analysis.
-  - `PHASE2_PLAN.md` — Complete implementation plan
-  - `SECURITY_DOCUMENTATION.md` — Comprehensive security analysis
-  - `PHASE2_SUBMISSION_REPORT.md` — Final submission report
-
-## Scripts
-
-From `package.json`:
-
-```bash
-npm run dev          # start Next.js dev server
-npm run build        # build production bundle
-npm run start        # start production server
-npm run lint         # run Next.js lint
-npm run test:phase2  # run Phase 2 test suite (unit, component, security tests)
-npm run test         # run individual test files
-npm run test:coverage # generate test coverage report
-```
-
-Mantle CLI (Move contract deployment):
-
-```bash
-one move build                    # compile Move contracts
-one move test                     # test Move contracts
-one client publish --gas-budget 100000000  # deploy to Mantle
-one client call --package <PKG_ID> --module property_nft --function create_property  # interact with contracts
-```
-
-## Phase 2 Testing & Security
-
-### Test Suite Status: ✅ **ALL TESTS PASSING**
-
-```bash
-📋 Phase 2 Test Results Summary
-================================
-Unit Tests: ✅ PASSED (17/17)
-Component Tests: ✅ PASSED  
-Security Tests: ✅ PASSED
-================================
-Overall Status: ✅ ALL TESTS PASSED
-🎉 Phase 2 Requirements Met!
-```
-
-### Test Coverage
-- **Property Creation & Fractionalization**: 4 tests
-- **Investment Logic**: 4 tests covering MNT/MIST conversion, share validation
-- **Trading Operations**: 2 tests for share transfers
-- **Property Fetching**: 3 tests for blockchain data retrieval
-- **User Investments**: 2 tests for portfolio tracking
-- **Package Deployment**: 2 tests for contract verification
-
-### Security Features
-- **Secure Logging System**: Sanitizes sensitive data (addresses, keys, digests)
-- **Input Validation**: Client and server-side validation
-- **Error Handling**: Production-safe error messages
-- **Transaction Security**: Proper gas handling and user confirmation
-- **Access Control**: Ownership verification for all operations
-
-### Run Tests
-```bash
-# Run complete Phase 2 test suite
-npm run test:phase2
-
-# Run specific test categories
-npm run test -- tests/property-contract.test.ts
-npm run test -- tests/components.test.tsx
-
-# Generate coverage report
-npm run test:coverage
-```
-
-## Environment
-
-Create `.env.local` at repo root:
-
-```env
-# Mantle Configuration
-NEXT_PUBLIC_Mantle_RPC_URL=https://rpc-testnet.onelabs.cc:443
-NEXT_PUBLIC_Mantle_NETWORK=testnet
-NEXT_PUBLIC_RWA_PACKAGE_ID=YOUR_PACKAGE_ID
-```
-
-## Workflow
-
-1) Install dependencies: `npm install`
-
-2) Configure environment: create `.env.local` with Mantle configuration.
-
-3) (Optional) Develop/compile/deploy Move contracts with Mantle CLI:
+1. **Clone the repository**
    ```bash
-   one move build
-   one client publish --gas-budget 100000000
+   git clone https://github.com/RWA-Exchange/RWA-Exchange-Mantle.git
+   cd RWA-Exchange-Mantle
    ```
 
-4) Update package ID in `.env.local` with your deployed contract address.
+2. **Install dependencies**
+   ```bash
+   npm install
+   ```
 
-5) Run the app: `npm run dev` and open http://localhost:3000
+3. **Configure Environment**
+   ```bash
+   cp .env.example .env.local
+   ```
+   Update `.env.local` with your Mantle RPC and contract addresses.
 
-6) Connect wallet (Mantle Wallet via navbar) and interact with the marketplace.
+4. **Deploy Contracts (Optional)**
+   ```bash
+   npx hardhat run scripts/deploy.ts --network mantle_testnet
+   ```
 
+5. **Run Frontend**
+   ```bash
+   npm run dev
+   ```
+   Open [http://localhost:3000](http://localhost:3000) to view the marketplace.
 
-## Troubleshooting
+---
 
-### Common Issues
+## 🛠️ Project Structure
 
-#### Wallet Connection Issues
-- **Mantle Wallet**: Install Mantle Wallet extension from the official website
-- **Wallet Standard**: The app uses Wallet Standard interface for Mantle integration
-- **Connection Fails**: Try refreshing the page and reconnecting
-- **No Wallet Detected**: Ensure Mantle Wallet extension is installed and unlocked
-- **Wrong Network**: Make sure you're connected to Mantle Testnet
+- `contracts/` — Solidity smart contracts (`PropertyNFT.sol`).
+- `scripts/` — Hardhat deployment and maintenance scripts.
+- `tests/` — Hardhat unit and integration tests.
+- `src/app/` — Next.js 16 App Router pages.
+- `src/components/` — UI components and forms.
+- `src/services/` — Blockchain interaction services (Ethers.js based).
+- `src/config/` — Network and application configuration.
 
-#### Mantle-Specific Issues
-- **RPC Connection**: If Mantle RPC is slow, check your network configuration at `https://rpc-testnet.onelabs.cc:443`
-- **Contract Interactions**: Ensure you have sufficient **MNT tokens** for gas fees (not ONE)
-- **Transaction Fails**: Check transaction on Explorer: `https://Explorer.cc/testnet/home`
-- **Property Not Loading**: Verify the property exists on Mantle testnet
-- **Investment Fails**: Ensure you have enough MNT for both the investment amount and gas fees
+---
 
-#### Build/Runtime Errors
-- **Module not found errors**: Run `npm install` to ensure all dependencies are installed
-- **Environment variable errors**: Ensure `.env.local` exists with valid Mantle configuration
-- **Next.js fails to start**: Clear `.next/` folder and retry: `rm -rf .next && npm run dev` (Windows: delete `.next` folder manually)
-- **TypeScript errors**: Run `npm run build` to check for type errors before deploying
+## 📜 Scripts
 
-#### Performance Issues
-- **Slow loading**: The app fetches real blockchain data which may take time
-- **Network timeouts**: Mantle testnet may have occasional delays
-- **Low gas fees**: Mantle offers significantly lower fees compared to Ethereum mainnet (~0.01-0.05 MNT per transaction)
-- **Development**: Always use Mantle testnet for development and testing
-
-### Getting Help
-- Check the [Mantle documentation](https://docs.Mantle.network)
-- Visit [Explorer Explorer](https://Explorer.cc/testnet/home) to verify transactions
-- Review contract addresses in `.env.local` if using custom deployments
-- Open an issue on GitHub for project-specific problems
-
-## Demo
-
-- Screenshots or GIFs
-  - Landing Page: `src/app/landing/page.tsx`
-  - Token Page and Listing Flow: `src/components/token-page/*`
-  
-Add your media under `public/` and embed here:
-
-```md
-![Landing](public/landing.png)
-![Marketplace](public/marketplace.png)
+```bash
+npm run dev           # Start Next.js dev server
+npm run build         # Build production bundle (Next.js 16 + Webpack)
+npm run lint          # Run Linter
+npx hardhat compile   # Compile Solidity contracts
+npx hardhat test      # Run smart contract tests
 ```
 
-## Contributing
+---
 
-Contributions are welcome! Please:
+## ⚠️ Troubleshooting
 
-- Fork the repo and create a feature branch.
-- Follow existing code style and run `npm run lint`.
-- Open a PR with a clear description and screenshots if UI changes.
+### Wallet Issues
+- **Wrong Network**: Ensure your wallet is set to **Mantle Sepolia** (Chain ID 5003).
+- **Connection**: If connection fails, refresh the page and ensure the wallet is unlocked.
+- **Gas Fees**: Ensure you have enough **MNT** for gas (~0.01 per tx).
 
-## License
+### Build Errors
+- **Module not found**: Delete `node_modules` and run `npm install --legacy-peer-deps`.
+- **Next.js Version**: The project uses Next.js 16. Ensure you are using the correct Node.js version.
 
-MIT ©  Contributors
+---
 
+## 📜 License
+
+MIT © RWA Exchange Contributors
