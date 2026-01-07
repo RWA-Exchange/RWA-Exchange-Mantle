@@ -10,8 +10,8 @@ export const APP_CONFIG = {
 
   // Blockchain configuration
   BLOCKCHAIN: {
-    RPC_URL: process.env.NEXT_PUBLIC_Mantle_RPC_URL || 'https://fullnode.testnet.sui.io:443',
-    PACKAGE_ID: process.env.NEXT_PUBLIC_RWA_PACKAGE_ID || '',
+    RPC_URL: process.env.NEXT_PUBLIC_MANTLE_RPC_URL || 'https://rpc.sepolia.mantle.xyz',
+    PACKAGE_ID: process.env.NEXT_PUBLIC_PROPERTY_NFT_ADDRESS || '',
   },
 };
 
