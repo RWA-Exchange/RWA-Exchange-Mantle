@@ -17,6 +17,7 @@ const nextConfig = {
         assert: false,
         os: false,
         path: false,
+        '@react-native-async-storage/async-storage': false,
       };
     }
 
