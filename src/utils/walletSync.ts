@@ -1,130 +1,26 @@
-import { MantleWalletStandardService } from '@/services/Mantle-wallet-standard';
-
 /**
- * Utility to synchronize wallet connection state across different parts of the app
+ * Legacy WalletSyncUtil.
+ * This class is currently placeholder-only to avoid build errors.
+ * Original functionality was based on a legacy wallet system.
  */
 export class WalletSyncUtil {
-  /**
-   * Check if wallet is truly connected by verifying multiple conditions
-   */
   static async isWalletConnected(): Promise<boolean> {
-    try {
-      // Check service connection state
-      const serviceConnected = MantleWalletStandardService.isConnected();
-
-      // Check if we have a connected account
-      const connectedAccount = MantleWalletStandardService.getConnectedAccount();
-
-      // Check if wallet extension is available
-      const walletAvailable = MantleWalletStandardService.isWalletExtensionAvailable();
-
-      // Refresh connection state to ensure it's current
-      const connectionRefreshed = await MantleWalletStandardService.refreshConnectionState();
-
-      return serviceConnected && !!connectedAccount && walletAvailable && connectionRefreshed;
-    } catch (error) {
-      console.error('Error checking wallet connection:', error);
-      return false;
-    }
+    return false;
   }
 
-  /**
-   * Get the connected account with validation
-   */
   static async getConnectedAccount() {
-    const isConnected = await this.isWalletConnected();
-    if (!isConnected) {
-      return null;
-    }
-
-    return MantleWalletStandardService.getConnectedAccount();
+    return null;
   }
 
-  /**
-   * Attempt to reconnect wallet if connection is lost
-   */
   static async attemptReconnection(): Promise<boolean> {
-    try {
-      // Check if wallet extension is available
-      if (!MantleWalletStandardService.isWalletExtensionAvailable()) {
-        throw new Error('Wallet extension not available');
-      }
-
-      // Try to refresh connection state first
-      const refreshed = await MantleWalletStandardService.refreshConnectionState();
-      if (refreshed) {
-        return true;
-      }
-
-      // If refresh failed, try to reconnect
-      const account = await MantleWalletStandardService.connectWalletExtension();
-      return !!account;
-    } catch (error) {
-      console.error('Failed to reconnect wallet:', error);
-      return false;
-    }
+    return false;
   }
 
-  /**
-   * Validate wallet connection before performing transactions
-   */
   static async validateConnectionForTransaction(): Promise<{ isValid: boolean; account: any; error?: string; capabilities?: any }> {
-    try {
-      const isConnected = await this.isWalletConnected();
-
-      if (!isConnected) {
-        // Try to reconnect
-        const reconnected = await this.attemptReconnection();
-
-        if (!reconnected) {
-          return {
-            isValid: false,
-            account: null,
-            error: 'Wallet not connected. Please connect your wallet to continue.'
-          };
-        }
-      }
-
-      const account = await this.getConnectedAccount();
-
-      if (!account || !account.address) {
-        return {
-          isValid: false,
-          account: null,
-          error: 'No valid account found. Please reconnect your wallet.'
-        };
-      }
-
-      // Check wallet capabilities
-      const capabilities = MantleWalletStandardService.getWalletCapabilities();
-
-      // Check if wallet supports at least one transaction method
-      const hasTransactionSupport =
-        capabilities['sui:signAndExecuteTransaction'] ||
-        capabilities['sui:signTransaction'] ||
-        capabilities['signAndExecuteTransactionBlock'] ||
-        capabilities['signAndExecuteTransaction'];
-
-      if (!hasTransactionSupport) {
-        return {
-          isValid: false,
-          account: null,
-          error: 'Wallet does not support transaction execution. Please use a compatible wallet like Sui Wallet.',
-          capabilities
-        };
-      }
-
-      return {
-        isValid: true,
-        account,
-        capabilities
-      };
-    } catch (error) {
-      return {
-        isValid: false,
-        account: null,
-        error: error instanceof Error ? error.message : 'Unknown wallet error'
-      };
-    }
+    return {
+      isValid: false,
+      account: null,
+      error: 'Legacy wallet utility disabled. Please use the new wallet connection system.'
+    };
   }
 }
