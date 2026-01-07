@@ -31,18 +31,15 @@ export const MANTLE_NETWORKS = {
 export const DEFAULT_NETWORK = MANTLE_NETWORKS.testnet;
 
 export const CONTRACT_ADDRESSES = {
-  [MANTLE_NETWORKS.testnet.chainId]: {
+  5003: {
     PropertyNFT: process.env.NEXT_PUBLIC_PROPERTY_NFT_ADDRESS || '',
   },
-  [MANTLE_NETWORKS.mainnet.chainId]: {
+  5000: {
     PropertyNFT: process.env.NEXT_PUBLIC_PROPERTY_NFT_ADDRESS_MAINNET || '',
   },
 } as const;
 
-export const SUPPORTED_CHAIN_IDS = [
-  MANTLE_NETWORKS.testnet.chainId,
-  MANTLE_NETWORKS.mainnet.chainId,
-] as const;
+export const SUPPORTED_CHAIN_IDS = [5003, 5000] as const;
 
 export function getNetworkConfig(chainId: number) {
   return Object.values(MANTLE_NETWORKS).find(network => network.chainId === chainId);
